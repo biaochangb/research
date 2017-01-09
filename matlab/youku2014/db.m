@@ -1,0 +1,9 @@
+function connection = db()
+    connection = mysql_db();
+function connection = mysql_db()
+    url = 'jdbc:mysql://localhost:3306/youku2014';
+    driver = 'com.mysql.jdbc.Driver';
+    username = 'root';
+    password = '';
+    database_name = 'youku2014';
+    connection = database(database_name,username, password, driver, url);

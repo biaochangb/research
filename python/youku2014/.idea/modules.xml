@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../EventEvolution/.idea/EventEvolution.iml" filepath="$PROJECT_DIR$/../EventEvolution/.idea/EventEvolution.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../larc/.idea/larc.iml" filepath="$PROJECT_DIR$/../larc/.idea/larc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/youku2014.iml" filepath="$PROJECT_DIR$/.idea/youku2014.iml" />
+    </modules>
+  </component>
+</project>
+
