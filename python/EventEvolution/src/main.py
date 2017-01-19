@@ -1,6 +1,7 @@
 __author__ = 'bchang'
-import Data
 import time
+
+import Data
 
 if __name__ == '__main__':
     print 'start'
@@ -10,4 +11,4 @@ if __name__ == '__main__':
     # {8: 1168, 9: 962, 10: 17723, 6: 1796, 7: 1535} 23184
     # Topics: 3608
     end_time = time.time()
-    print 'Running time: %f h.\r\n'%((end_time-start_time)/3600)
+    print 'Running time: %f h.\r\n' % ((end_time - start_time) / 3600)

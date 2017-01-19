@@ -1,24 +1,27 @@
-#coding:utf-8
+# coding:utf-8
 __author__ = 'bchang'
 
-import redis
 import json
-import Event
-import unicodedata
-import chardet
 import re
+
+import redis
+
+import Event
 
 listA = [0]
 listB = listA
 listB.append(1)
 print listA
 
+
 def is_ascii(s):
     return all(ord(c) < 128 for c in s)
+
 
 def is_chinese(s):
     r = re.findall(ur'[\u4e00-\u9fff]+', s)
     return len(r) > 0
+
 
 def isValid(keywords):
     """
@@ -30,6 +33,7 @@ def isValid(keywords):
             flag = False
             break
     return flag
+
 
 r = redis.Redis(host='10.0.109.33', port=8181, db=0)
 e = Event.Event()
@@ -49,7 +53,7 @@ for e in events_str:
     if flag == 1:
         m += 1
         print "eeeeeeeeee"
-print "m =",m
+print "m =", m
 
 events_str = r.lrange("twitter:sg:event:python:detections2", 0, -1)
 

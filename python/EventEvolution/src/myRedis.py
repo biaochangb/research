@@ -1,7 +1,9 @@
 __author__ = 'bchang'
 
-import redis
 import pickle
+
+import redis
+
 
 class Redis:
     redis = None
@@ -12,12 +14,12 @@ class Redis:
     redis_db = "../data/redis.db"
 
     def __init__(self):
-        self.redis = redis.Redis(host= self.redis_host, port=self.redis_port, db=0)
+        self.redis = redis.Redis(host=self.redis_host, port=self.redis_port, db=0)
 
     def getValidTopicID(self):
         """ valid topic IDs = filter - invalid """
-        filter = self.redis.lrange(self.redis_key_prefix+"topics:filter", 0, -1)
-        invalid = self.redis.lrange(self.redis_key_prefix+"topics:invalid", 0, -1)
+        filter = self.redis.lrange(self.redis_key_prefix + "topics:filter", 0, -1)
+        invalid = self.redis.lrange(self.redis_key_prefix + "topics:invalid", 0, -1)
         for t in filter:
             if t not in invalid:
                 self.redis.rpush(self.redis_key_prefix + 'topics:valid', t)
@@ -46,7 +48,7 @@ class Redis:
         d = pickle.load(read)
         print len(d)
         d = pickle.load(read)
-        print len(d),d[0]
+        print len(d), d[0]
 
     def load2Reids(self):
         read = open(self.redis_db, 'r')
@@ -67,8 +69,9 @@ class Redis:
             self.redis.rpush('changbiao:event:evolution:twitter:sg:topics:valid', e)
         read.close()
 
+
 if __name__ == '__main__':
     myRedis = Redis()
-    #myRedis.getValidTopicID()
-    #myRedis.saveData()
-    #myRedis.load2Reids()
+    # myRedis.getValidTopicID()
+    # myRedis.saveData()
+    # myRedis.load2Reids()

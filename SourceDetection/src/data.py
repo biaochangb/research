@@ -5,8 +5,9 @@ created at 2017/1/7.
 """
 
 # coding=utf-8
-import networkx as nx
 import random
+
+import networkx as nx
 
 
 class Graph:

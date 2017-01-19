@@ -2,10 +2,38 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d9e6c4dd-35e5-446d-bf07-9736df33bd68" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/SourceDetection/src/data.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/SourceDetection/src/rumor_centrality.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/SourceDetection/src/test.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/SourceDetection/src/distance_center.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/SourceDetection/src/dynamic_importance.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/SourceDetection/src/dynamic_message_passing.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/SourceDetection/src/jordan_center.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/SourceDetection/src/main.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/SourceDetection/src/map_gsba.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/SourceDetection/src/method.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/SourceDetection/src/reverse_infection.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SourceDetection/src/data.py" afterPath="$PROJECT_DIR$/SourceDetection/src/data.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SourceDetection/src/test.py" afterPath="$PROJECT_DIR$/SourceDetection/src/test.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/EventEvolution/src/Data.py" afterPath="$PROJECT_DIR$/python/EventEvolution/src/Data.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/EventEvolution/src/RedisTest.py" afterPath="$PROJECT_DIR$/python/EventEvolution/src/RedisTest.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/EventEvolution/src/Topic.py" afterPath="$PROJECT_DIR$/python/EventEvolution/src/Topic.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/EventEvolution/src/main.py" afterPath="$PROJECT_DIR$/python/EventEvolution/src/main.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/EventEvolution/src/myRedis.py" afterPath="$PROJECT_DIR$/python/EventEvolution/src/myRedis.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/TendencyPrediction/src/data_preprocess.py" afterPath="$PROJECT_DIR$/python/TendencyPrediction/src/data_preprocess.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/TendencyPrediction/src/dataset.py" afterPath="$PROJECT_DIR$/python/TendencyPrediction/src/dataset.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/TendencyPrediction/src/numpytest.py" afterPath="$PROJECT_DIR$/python/TendencyPrediction/src/numpytest.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/TendencyPrediction/src/running.py" afterPath="$PROJECT_DIR$/python/TendencyPrediction/src/running.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/TendencyPrediction/src/saveToFile.py" afterPath="$PROJECT_DIR$/python/TendencyPrediction/src/saveToFile.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/TendencyPrediction/src/semi_supervised - 副本.py" afterPath="$PROJECT_DIR$/python/TendencyPrediction/src/semi_supervised - 副本.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/TendencyPrediction/src/semi_supervised.py" afterPath="$PROJECT_DIR$/python/TendencyPrediction/src/semi_supervised.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/TendencyPrediction/src/tool.py" afterPath="$PROJECT_DIR$/python/TendencyPrediction/src/tool.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/larc/ImageCrawler.py" afterPath="$PROJECT_DIR$/python/larc/ImageCrawler.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/youku2014/src/ARMA.py" afterPath="$PROJECT_DIR$/python/youku2014/src/ARMA.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/youku2014/src/Dataset.py" afterPath="$PROJECT_DIR$/python/youku2014/src/Dataset.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/youku2014/src/NAR.py" afterPath="$PROJECT_DIR$/python/youku2014/src/NAR.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/youku2014/src/numpytest.py" afterPath="$PROJECT_DIR$/python/youku2014/src/numpytest.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/youku2014/src/test.py" afterPath="$PROJECT_DIR$/python/youku2014/src/test.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python/youku2014/src/visiting.py" afterPath="$PROJECT_DIR$/python/youku2014/src/visiting.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/SourceDetection/src/rumor_centrality.py" afterPath="$PROJECT_DIR$/SourceDetection/src/rumor_center.py" />
     </list>
     <ignored path="research.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -29,23 +57,61 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/README.md">
+      <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SourceDetection/src/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="253">
+              <caret line="20" column="7" lean-forward="true" selection-start-line="20" selection-start-column="7" selection-end-line="22" selection-end-column="12" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/SourceDetection/src/test.py">
+      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SourceDetection/src/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="182">
-              <caret line="12" column="12" lean-forward="true" selection-start-line="12" selection-start-column="12" selection-end-line="12" selection-end-column="12" />
+            <state relative-caret-position="373">
+              <caret line="28" column="40" lean-forward="true" selection-start-line="28" selection-start-column="40" selection-end-line="28" selection-end-column="40" />
               <folding>
-                <element signature="e#0#21#0" expanded="true" />
+                <element signature="e#166#187#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="reverse_infection.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SourceDetection/src/reverse_infection.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="138">
+              <caret line="6" column="14" lean-forward="true" selection-start-line="6" selection-start-column="14" selection-end-line="7" selection-end-column="21" />
+              <folding>
+                <element signature="e#165#186#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="dynamic_message_passing.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SourceDetection/src/dynamic_message_passing.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-64">
+              <caret line="8" column="21" lean-forward="true" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
+              <folding>
+                <element signature="e#166#179#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="map_gsba.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/SourceDetection/src/map_gsba.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="258">
+              <caret line="40" column="21" lean-forward="true" selection-start-line="40" selection-start-column="21" selection-end-line="40" selection-end-column="21" />
+              <folding>
+                <element signature="e#167#180#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -54,20 +120,52 @@
       <file leaf-file-name="data.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SourceDetection/src/data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="367">
-              <caret line="35" column="36" lean-forward="false" selection-start-line="35" selection-start-column="36" selection-end-line="35" selection-end-column="36" />
+            <state relative-caret-position="276">
+              <caret line="41" column="52" lean-forward="false" selection-start-line="41" selection-start-column="32" selection-end-line="41" selection-end-column="52" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="method.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SourceDetection/src/method.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="327">
+              <caret line="42" column="17" lean-forward="false" selection-start-line="42" selection-start-column="17" selection-end-line="42" selection-end-column="17" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="rumor_center.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SourceDetection/src/rumor_center.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="736">
+              <caret line="32" column="11" lean-forward="false" selection-start-line="32" selection-start-column="11" selection-end-line="32" selection-end-column="11" />
               <folding>
-                <element signature="e#165#186#0" expanded="true" />
+                <element signature="e#166#177#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="rumor_centrality.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SourceDetection/src/rumor_centrality.py">
+      <file leaf-file-name="dynamic_importance.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SourceDetection/src/dynamic_importance.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="43" column="68" lean-forward="false" selection-start-line="43" selection-start-column="68" selection-end-line="43" selection-end-column="68" />
+            <state relative-caret-position="649">
+              <caret line="29" column="35" lean-forward="false" selection-start-line="29" selection-start-column="35" selection-end-line="29" selection-end-column="35" />
+              <folding>
+                <element signature="e#166#187#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="jordan_center.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SourceDetection/src/jordan_center.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="5">
+              <caret line="19" column="8" lean-forward="false" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
               <folding>
                 <element signature="e#166#187#0" expanded="true" />
               </folding>
@@ -98,8 +196,18 @@
         <option value="$PROJECT_DIR$/SourceDetection/src/ss.py" />
         <option value="$PROJECT_DIR$/SourceDetection/src/graph.py" />
         <option value="$PROJECT_DIR$/SourceDetection/src/data.py" />
-        <option value="$PROJECT_DIR$/SourceDetection/src/test.py" />
         <option value="$PROJECT_DIR$/SourceDetection/src/rumor_centrality.py" />
+        <option value="$PROJECT_DIR$/SourceDetection/src/distance_centrality.py" />
+        <option value="$PROJECT_DIR$/SourceDetection/src/dynamic_importance.py" />
+        <option value="$PROJECT_DIR$/SourceDetection/src/distance_center.py" />
+        <option value="$PROJECT_DIR$/SourceDetection/src/jordan_center.py" />
+        <option value="$PROJECT_DIR$/SourceDetection/src/test.py" />
+        <option value="$PROJECT_DIR$/SourceDetection/src/reverse_infection.py" />
+        <option value="$PROJECT_DIR$/SourceDetection/src/dynamic_message_passing.py" />
+        <option value="$PROJECT_DIR$/SourceDetection/src/rumor_center.py" />
+        <option value="$PROJECT_DIR$/SourceDetection/src/method.py" />
+        <option value="$PROJECT_DIR$/SourceDetection/src/map_gsba.py" />
+        <option value="$PROJECT_DIR$/SourceDetection/src/main.py" />
       </list>
     </option>
   </component>
@@ -239,28 +347,28 @@
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$USER_HOME$/AppData/Local/GitHub/PortableGit_d7effa1a4a322478cd29c826b52a0c118ad3db11/cmd/git.exe" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="settings.editor.selected.configurable" value="fileTemplates" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Font" />
   </component>
-  <component name="RunManager" selected="Python.test (1)">
-    <configuration default="false" name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
+  <component name="RunManager" selected="Python.main">
+    <configuration default="false" name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/SourceDetection/method" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/SourceDetection/src" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="research" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/SourceDetection/method/test.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/SourceDetection/src/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
-    <configuration default="false" name="test (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration default="false" name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -274,6 +382,42 @@
       <module name="research" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/SourceDetection/src/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="jordan_center" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/SourceDetection/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="research" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/SourceDetection/src/jordan_center.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="reverse_infection" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/SourceDetection/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="research" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/SourceDetection/src/reverse_infection.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -418,14 +562,18 @@
       <option name="USE_KEYWORD" value="false" />
       <method />
     </configuration>
-    <list size="2">
-      <item index="0" class="java.lang.String" itemvalue="Python.test" />
-      <item index="1" class="java.lang.String" itemvalue="Python.test (1)" />
+    <list size="4">
+      <item index="0" class="java.lang.String" itemvalue="Python.main" />
+      <item index="1" class="java.lang.String" itemvalue="Python.test" />
+      <item index="2" class="java.lang.String" itemvalue="Python.jordan_center" />
+      <item index="3" class="java.lang.String" itemvalue="Python.reverse_infection" />
     </list>
     <recent_temporary>
-      <list size="2">
-        <item index="0" class="java.lang.String" itemvalue="Python.test (1)" />
-        <item index="1" class="java.lang.String" itemvalue="Python.test" />
+      <list size="4">
+        <item index="0" class="java.lang.String" itemvalue="Python.main" />
+        <item index="1" class="java.lang.String" itemvalue="Python.reverse_infection" />
+        <item index="2" class="java.lang.String" itemvalue="Python.test" />
+        <item index="3" class="java.lang.String" itemvalue="Python.jordan_center" />
       </list>
     </recent_temporary>
   </component>
@@ -446,20 +594,20 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
-    <editor active="false" />
+    <frame x="-8" y="-8" width="1456" height="876" extended-state="7" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24400564" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18265162" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32898173" sideWeight="0.50277776" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32974428" sideWeight="0.50282085" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32839838" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32974428" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32974428" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32974428" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33916554" sideWeight="0.49722221" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33512786" sideWeight="0.49722221" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32974428" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32974428" sideWeight="0.49717912" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39973083" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -498,7 +646,7 @@
         <state relative-caret-position="76">
           <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -524,7 +672,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -583,9 +731,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="281">
           <caret line="105" column="3" lean-forward="true" selection-start-line="105" selection-start-column="3" selection-end-line="105" selection-end-column="3" />
-          <folding>
-            <element signature="e#3147#3211#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -599,7 +745,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
+        <state relative-caret-position="-9">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
@@ -629,16 +775,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SourceDetection/src/data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="367">
-          <caret line="35" column="36" lean-forward="false" selection-start-line="35" selection-start-column="36" selection-end-line="35" selection-end-column="36" />
-          <folding>
-            <element signature="e#165#186#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharmCE2016.3/system/python_stubs/-762174762/__builtin__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-3323">
@@ -655,10 +791,76 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SourceDetection/src/rumor_centrality.py">
+    <entry file="file://C:/Python27/Lib/site-packages/scipy/sparse/linalg/eigen/arpack/arpack.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="43" column="68" lean-forward="false" selection-start-line="43" selection-start-column="68" selection-end-line="43" selection-end-column="68" />
+        <state relative-caret-position="154">
+          <caret line="1237" column="0" lean-forward="false" selection-start-line="1237" selection-start-column="0" selection-end-line="1237" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/scipy/sparse/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="694" column="30" lean-forward="false" selection-start-line="694" selection-start-column="23" selection-end-line="694" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/python/youku2014/src/ARMA.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="11" column="18" lean-forward="true" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/networkx/algorithms/distance_measures.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="53" column="13" lean-forward="false" selection-start-line="53" selection-start-column="12" selection-end-line="53" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/networkx/algorithms/shortest_paths/unweighted.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="177">
+          <caret line="65" column="15" lean-forward="false" selection-start-line="65" selection-start-column="11" selection-end-line="65" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/networkx/classes/function.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="16">
+          <caret line="302" column="4" lean-forward="false" selection-start-line="302" selection-start-column="4" selection-end-line="302" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/networkx/algorithms/shortest_paths/weighted.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-122">
+          <caret line="426" column="4" lean-forward="false" selection-start-line="426" selection-start-column="4" selection-end-line="426" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceDetection/src/distance_center.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="258">
+          <caret line="29" column="75" lean-forward="true" selection-start-line="29" selection-start-column="75" selection-end-line="30" selection-end-column="68" />
+          <folding>
+            <element signature="e#166#187#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceDetection/src/jordan_center.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5">
+          <caret line="19" column="8" lean-forward="false" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
           <folding>
             <element signature="e#166#187#0" expanded="true" />
           </folding>
@@ -667,10 +869,94 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/SourceDetection/src/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="182">
-          <caret line="12" column="12" lean-forward="true" selection-start-line="12" selection-start-column="12" selection-end-line="12" selection-end-column="12" />
+        <state relative-caret-position="253">
+          <caret line="20" column="7" lean-forward="true" selection-start-line="20" selection-start-column="7" selection-end-line="22" selection-end-column="12" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/networkx/linalg/graphmatrix.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-259">
+          <caret line="105" column="4" lean-forward="false" selection-start-line="105" selection-start-column="4" selection-end-line="105" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceDetection/src/reverse_infection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="138">
+          <caret line="6" column="14" lean-forward="true" selection-start-line="6" selection-start-column="14" selection-end-line="7" selection-end-column="21" />
+          <folding>
+            <element signature="e#165#186#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceDetection/src/dynamic_importance.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="649">
+          <caret line="29" column="35" lean-forward="false" selection-start-line="29" selection-start-column="35" selection-end-line="29" selection-end-column="35" />
+          <folding>
+            <element signature="e#166#187#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceDetection/src/rumor_center.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="736">
+          <caret line="32" column="11" lean-forward="false" selection-start-line="32" selection-start-column="11" selection-end-line="32" selection-end-column="11" />
+          <folding>
+            <element signature="e#166#177#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceDetection/src/dynamic_message_passing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-64">
+          <caret line="8" column="21" lean-forward="true" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
+          <folding>
+            <element signature="e#166#179#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceDetection/src/data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="276">
+          <caret line="41" column="52" lean-forward="false" selection-start-line="41" selection-start-column="32" selection-end-line="41" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceDetection/src/method.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="327">
+          <caret line="42" column="17" lean-forward="false" selection-start-line="42" selection-start-column="17" selection-end-line="42" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceDetection/src/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="373">
+          <caret line="28" column="40" lean-forward="true" selection-start-line="28" selection-start-column="40" selection-end-line="28" selection-end-column="40" />
+          <folding>
+            <element signature="e#166#187#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceDetection/src/map_gsba.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="258">
+          <caret line="40" column="21" lean-forward="true" selection-start-line="40" selection-start-column="21" selection-end-line="40" selection-end-column="21" />
+          <folding>
+            <element signature="e#167#180#0" expanded="true" />
           </folding>
         </state>
       </provider>

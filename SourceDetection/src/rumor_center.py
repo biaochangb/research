@@ -6,48 +6,45 @@ created at 2017/1/8.
 
 # coding=utf-8
 
-import networkx as nx
-from data import *
-from decimal import *
 import math
+from decimal import *
+
+import method
+from data import *
 
 
-class RumorCentrality:
+class RumorCenter(method.Method):
     """
         detect the source with Rumor Centrality.
-        Refer to
+        Please refer to the following paper for more details.
         Shah D, Zaman T. Detecting sources of computer viruses in networks: theory and experiment[J].
         ACM SIGMETRICS Performance Evaluation Review, 2010, 38(1): 203-214.
     """
 
     visited = set()  # node set
     bfs_tree = nx.Graph()
-    source = ''
 
-    def detect(self, graph):
+    def detect(self):
         """detect the source with Rumor Centrality.
-        Args:
-            @type graph: nx.Graph
+
         Returns:
             @rtype:int
             the detected source
         """
-        if graph.number_of_nodes() == 0:
+        if self.graph.number_of_nodes() == 0:
             print 'graph.number_of_nodes =0'
             return
-        self.source = graph.nodes()[0]  # the initial node
-        self.bfs_tree = nx.bfs_tree(graph, self.source)
+        self.source = self.graph.nodes()[0]  # the initial node
+        self.bfs_tree = nx.bfs_tree(self.graph, self.source)
         self.visited.clear()
         self.get_number_in_subtree(self.source)
         self.visited.clear()
         self.get_centrality(self.source)
-        result = nx.get_node_attributes(self.bfs_tree, 'centrality')
-        result = sorted(result.items(), key=lambda d: d[1], reverse=True)
-        return result
+        return self.sort_nodes_by_centrality()
 
     def get_centrality(self, u):
-        """
-        get centralities for all nodes by passing a message from the root to the children.
+        """get centralities for all nodes by passing a message from the root to the children.
+
         Args:
             u:
         """
@@ -63,6 +60,7 @@ class RumorCentrality:
             centrality = nx.get_node_attributes(self.bfs_tree, 'centrality')[parent] * numberOfNodesInSubtree / (
                 self.bfs_tree.number_of_nodes() - numberOfNodesInSubtree)
         nx.set_node_attributes(self.bfs_tree, 'centrality', {u: centrality})
+        nx.set_node_attributes(self.graph, 'centrality', {u: centrality})
 
         children = nx.all_neighbors(self.bfs_tree, u)
         for c in children:
@@ -70,9 +68,9 @@ class RumorCentrality:
                 self.get_centrality(c)
 
     def get_number_in_subtree(self, p):
-        """
-        passing messages from children nodes to the parent, to get the number of nodes in the subtree rooted by p,
-        and the cumulative product of the size of the subtrees of all nodes in p' subtree
+        """passing messages from children nodes to the parent, to get the number of nodes in the subtree rooted by p,
+        and the cumulative product of the size of the subtrees of all nodes in p' subtree.
+
         Args:
             p: parent node
         Returns:

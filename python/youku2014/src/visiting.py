@@ -1,17 +1,13 @@
-#coding:utf-8
+# coding:utf-8
 
 __author__ = 'bchang'
 
-import os;
-import MySQLdb
-import math
-import random
 import time
-import decimal
-import pickle
-from numpy import *
-from NAR import *
+
+import MySQLdb
+
 from ARMA import *
+
 
 class Visiting:
     host = 'localhost'
@@ -35,36 +31,38 @@ class Visiting:
 
     def saveAllRawData(self):
         print 'save Raw Data'
-        self.cursor.execute('SELECT a.vid,episode_num FROM (SELECT vid,MAX(nth) AS episode_num FROM youku2014.epiosde_view_mainland_chain GROUP BY vid) AS a WHERE a.episode_num>10')
-        vids = self.cursor.fetchall()   # ids of all serials
+        self.cursor.execute(
+            'SELECT a.vid,episode_num FROM (SELECT vid,MAX(nth) AS episode_num FROM youku2014.epiosde_view_mainland_chain GROUP BY vid) AS a WHERE a.episode_num>10')
+        vids = self.cursor.fetchall()  # ids of all serials
 
         MAX_EPISODE_NUM = 100
         RECORDS_LIMIT = 50
-        views = array([zeros([MAX_EPISODE_NUM,RECORDS_LIMIT]) for i in range(len(vids))])
+        views = array([zeros([MAX_EPISODE_NUM, RECORDS_LIMIT]) for i in range(len(vids))])
         serials_episodes_records = {}
         shape(views)
         k = 0
         for vid in vids:
-            serial_views = zeros([MAX_EPISODE_NUM,RECORDS_LIMIT])
+            serial_views = zeros([MAX_EPISODE_NUM, RECORDS_LIMIT])
             episode_num = {}
-            for nth in range(1,vid[1]+1):
-                sql = 'SELECT vv FROM youku2014.epiosde_view_mainland_chain WHERE vid=%d and nth=%d ORDER BY DATE limit %d'%(vid[0], nth, RECORDS_LIMIT)
+            for nth in range(1, vid[1] + 1):
+                sql = 'SELECT vv FROM youku2014.epiosde_view_mainland_chain WHERE vid=%d and nth=%d ORDER BY DATE limit %d' % (
+                vid[0], nth, RECORDS_LIMIT)
                 self.cursor.execute(sql)
                 episode_views = self.cursor.fetchall()
                 episode_num[nth] = len(episode_views)
-                if episode_num[nth]==0:
+                if episode_num[nth] == 0:
                     continue
                 array2 = array(episode_views)
-                serial_views[nth-1][0:episode_num[nth]] = array2[:,0]
-                #serial_views.append(list(array2[:,0]))
+                serial_views[nth - 1][0:episode_num[nth]] = array2[:, 0]
+                # serial_views.append(list(array2[:,0]))
             views[k] = serial_views
             serials_episodes_records[k] = episode_num;
             k += 1
-            #print views,k,serials_episodes_records,sql
-            #break
+            # print views,k,serials_episodes_records,sql
+            # break
         write = open(self.views_file, 'wb')
         pickle.dump(views, write)
-        pickle.dump(serials_episodes_records,write)
+        pickle.dump(serials_episodes_records, write)
         write.close()
 
     def loadRawData(self):
@@ -73,7 +71,7 @@ class Visiting:
         views = pickle.load(read)
         serials_episodes_records = pickle.load(read)
         read.close()
-        return views,serials_episodes_records
+        return views, serials_episodes_records
 
     def experiment(self):
         """cross validation"""
@@ -82,14 +80,14 @@ class Visiting:
         arma = ARMA()
         # nar.crossValidation(self.views,n_day,self.serials_episodes_records,n_fold)
         # arma.crossValidation(self.views,n_day,self.serials_episodes_records,n_fold)
-        for n_day in range(0,7):
+        for n_day in range(0, 7):
             error = []
             type = 0
             # for lbd in  range(0,50,2):
             #     arma.lbd = exp(lbd/10.0)
             #     p,q,w,rmse = arma.crossValidation(self.views,n_day,self.serials_episodes_records,n_fold, type)
             #     print 'lambda =',exp(lbd/10.0),rmse,q
-            p,w,rmse = nar.crossValidation(self.views,n_day,self.serials_episodes_records,n_fold, type)
+            p, w, rmse = nar.crossValidation(self.views, n_day, self.serials_episodes_records, n_fold, type)
             error.append(rmse)
             print w
             # p,q,w,rmse = arma.crossValidation(self.views,n_day,self.serials_episodes_records,n_fold, type)
@@ -110,7 +108,7 @@ if __name__ == '__main__':
     print 'start'
     start_time = time.time()
     visiting = Visiting()
-    #visiting.saveAllRawData()
+    # visiting.saveAllRawData()
     visiting.experiment()
     end_time = time.time()
-    print 'running time: %f \r\n'%((end_time-start_time)/3600)
+    print 'running time: %f \r\n' % ((end_time - start_time) / 3600)

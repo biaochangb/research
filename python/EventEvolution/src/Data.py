@@ -1,11 +1,14 @@
 __author__ = 'bchang'
 
-import redis
-import requests
-import Event
-import Topic
 import pickle
 import re
+
+import redis
+import requests
+
+import Event
+import Topic
+
 
 class Data:
     redis = None
@@ -26,7 +29,7 @@ class Data:
     data_file = "../data/events.data"
 
     def __init__(self):
-        self.redis = redis.Redis(host= self.redis_host, port=self.redis_port, db=0)
+        self.redis = redis.Redis(host=self.redis_host, port=self.redis_port, db=0)
 
     def preprocessing(self):
         self.getEvents()
@@ -45,7 +48,7 @@ class Data:
         for t in self.topics:
             self.redis.rpush(self.redis_key_prefix + 'topics:all', t.__dict__)
             n = len(t.events)
-            if  self.min_events_num_in_topic <= n <= self.max_events_num_in_topic:
+            if self.min_events_num_in_topic <= n <= self.max_events_num_in_topic:
                 self.redis.rpush(self.redis_key_prefix + 'topics:filter', t.id)
                 if n in counts:
                     counts[n] += 1
@@ -70,7 +73,7 @@ class Data:
             event = eval(event_str)
             n = len(event['keywords'])
             if (n < self.min_keywords_num) or (event['t'] > "2016-00-00 00:00:00") \
-                or (not self.isValid(event['keywords'])):
+                    or (not self.isValid(event['keywords'])):
                 continue
             if n in counts:
                 counts[n] += 1
@@ -99,7 +102,7 @@ class Data:
         for i in range(len(self.topics)):
             a = set(event.keywords)
             b = self.topics[i].keywords
-            k = len(a&b)    # the number of sharing keywords
+            k = len(a & b)  # the number of sharing keywords
             if similarity_max < k:
                 similarity_max = k
                 index_max = i
