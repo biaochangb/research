@@ -31,11 +31,13 @@ class RumorCenter(method.Method):
             @rtype:int
             the detected source
         """
-        if self.graph.number_of_nodes() == 0:
-            print 'graph.number_of_nodes =0'
+        if self.subgraph.number_of_nodes() == 0:
+            print 'subgraph.number_of_nodes =0'
             return
-        self.source = self.graph.nodes()[0]  # the initial node
-        self.bfs_tree = nx.bfs_tree(self.graph, self.source)
+
+        self.reset_centrality()
+        self.source = self.subgraph.nodes()[0]  # the initial node
+        self.bfs_tree = nx.bfs_tree(self.subgraph, self.source)
         self.visited.clear()
         self.get_number_in_subtree(self.source)
         self.visited.clear()
@@ -60,7 +62,7 @@ class RumorCenter(method.Method):
             centrality = nx.get_node_attributes(self.bfs_tree, 'centrality')[parent] * numberOfNodesInSubtree / (
                 self.bfs_tree.number_of_nodes() - numberOfNodesInSubtree)
         nx.set_node_attributes(self.bfs_tree, 'centrality', {u: centrality})
-        nx.set_node_attributes(self.graph, 'centrality', {u: centrality})
+        nx.set_node_attributes(self.subgraph, 'centrality', {u: centrality})
 
         children = nx.all_neighbors(self.bfs_tree, u)
         for c in children:

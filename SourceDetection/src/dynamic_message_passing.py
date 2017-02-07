@@ -23,3 +23,5 @@ class DynamicMessagePassing(method.Method):
             @rtype:int
             the detected source
         """
+        self.reset_centrality()
+        return []

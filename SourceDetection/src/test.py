@@ -12,7 +12,7 @@ import rumor_center
 
 Decimal('0.142857')
 d = data.Graph("../data/test.txt")
-# nx.draw(d.graph)
+# nx.draw(d.subgraph)
 # plt.show()
 a = {e: random.random() for e in d.graph.edges_iter()}
 nx.set_edge_attributes(d.graph, 'weight', a)

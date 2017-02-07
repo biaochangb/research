@@ -24,11 +24,11 @@ class JordanCenter(method.Method):
             @rtype:int
             the detected source
         """
-
-        distances = nx.all_pairs_dijkstra_path_length(self.graph, weight='weight')
+        self.reset_centrality()
+        distances = nx.all_pairs_dijkstra_path_length(self.subgraph, weight='weight')
         centrality = {}
-        for u in nx.nodes(self.graph):
+        for u in nx.nodes(self.subgraph):
             row = dict(distances[u])
             k = max(row, key=row.get)
-            nx.set_node_attributes(self.graph, 'centrality', {u: 1.0/row[k]})
+            nx.set_node_attributes(self.subgraph, 'centrality', {u: 1.0 / row[k]})
         return self.sort_nodes_by_centrality()
