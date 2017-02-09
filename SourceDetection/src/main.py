@@ -41,9 +41,10 @@ def initialize_evaluation_measures(precision, error, topological_error, ranking,
         ranking['random_test'][m.method_name] = list()
 
 
-def full_test(d, precision, error, topological_error, ranking, methods, random_test=False, random_num=1):
-    """Full test: each node is selected to be the source"""
-
+def detection_test(d, precision, error, topological_error, ranking, methods, random_test=False, random_num=1):
+    """Full test: each node is selected to be the source
+        Random test: randomly select a node as the infection source
+    """
     test = 'full_test'
     nodes = d.graph.nodes()
     number_of_nodes = len(nodes)
@@ -59,6 +60,7 @@ def full_test(d, precision, error, topological_error, ranking, methods, random_t
         number_of_nodes = len(nodes)
     i = 0
     p = 0.1
+    print test, len(nodes)
     for s in nodes:
         i += 1
         if abs(i - number_of_nodes * p) < 1:
@@ -93,10 +95,11 @@ def full_test(d, precision, error, topological_error, ranking, methods, random_t
 
 start_time = clock()
 print "Starting..."
-d = data.Graph("../data/test.txt")
+d = data.Graph("../data/test.txt", weighted=1)
 d = data.Graph("../data/power-grid.txt")
 d.debug = False
-d.ratio_infected = 0.002
+d.ratio_infected = 0.001
+random_num=0.01 * d.graph.number_of_nodes()
 print 'Graph size: ', d.graph.number_of_nodes(), d.graph.number_of_edges(), d.graph.number_of_nodes() * d.ratio_infected
 weight = nx.get_edge_attributes(d.graph, 'weight')
 if d.debug:
@@ -104,6 +107,7 @@ if d.debug:
 
 methods = [rc.RumorCenter(d), di.DynamicImportance(d), dc.DistanceCenter(d),
            jc.JordanCenter(d), ri.ReverseInfection(d), dmp.DynamicMessagePassing(d), gsba.GSBA(d)]
+methods = [dmp.DynamicMessagePassing(d), gsba.GSBA(d) ]
 
 precision = {}  # Detection Rate
 error = {}  # Detection Error
@@ -117,15 +121,22 @@ initialize_evaluation_measures(precision, error, topological_error, ranking, met
 # if d.debug:
 #     print distances
 initialize_time = clock()
-
-print "full test"
-# full_test(d, precision, error, topological_error, ranking, methods)
+#detection_test(d, precision, error, topological_error, ranking, methods)
 full_test_time = clock()
-full_test(d, precision, error, topological_error, ranking, methods, random_test=True,
-          random_num=0.2 * d.graph.number_of_nodes())
+
+detection_test(d, precision, error, topological_error, ranking, methods, random_test=True,
+               random_num=random_num)
 random_test_time = clock()
 print "Runing time:", start_time, (initialize_time - start_time), (full_test_time - initialize_time), (
 random_test_time - full_test_time)
+
+test = "full_test"
 for m in methods:
-    print sum(precision['full_test'][m.method_name]), sum(error['full_test'][m.method_name]), sum(
-        topological_error['full_test'][m.method_name]), sum(ranking['full_test'][m.method_name]), m.method_name
+    l = len(precision[test][m.method_name])+1.0
+    print sum(precision[test][m.method_name])/l, sum(error[test][m.method_name])/l, sum(
+        topological_error[test][m.method_name])/l, sum(ranking[test][m.method_name])/l, m.method_name
+test = "random_test"
+for m in methods:
+    l = len(precision[test][m.method_name])+1.0
+    print sum(precision[test][m.method_name])/l, sum(error[test][m.method_name])/l, sum(
+        topological_error[test][m.method_name])/l, sum(ranking[test][m.method_name])/l, m.method_name

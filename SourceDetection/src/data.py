@@ -12,8 +12,12 @@ import networkx as nx
 
 class Graph:
     graph = nx.Graph()
+    node2index = {} # index all nodes in graph, from 0 to n-1: node->index
+    index2node = {} # from index to node: index->node
+
     subgraph = ''   # the infected subgraph
     infected_nodes = set()
+    weights = {}
     """@type subgraph: nx.Graph"""
 
     ratio_infected = 0.1  # the ratio of the number of nodes being infected
@@ -41,12 +45,19 @@ class Graph:
                 self.graph = nx.read_gml(path)
             elif path.endswith('.txt'):
                 self.graph = nx.read_weighted_edgelist(path, comments=comments)
-            self.set_weight_random()
         self.subgraph = self.graph
+        self.weights = nx.get_edge_attributes(self.graph, 'weight')
+        i = 0
+        for v in self.graph.nodes():
+            self.node2index[v] = i
+            self.index2node[i] = v
+            i += 1
+
     def set_weight_random(self):
         """  set edges with random weights
         """
         a = {e: random.random() for e in self.graph.edges_iter()}
+        #a = {e: 0.4 for e in self.graph.edges_iter()}
         nx.set_edge_attributes(self.graph, 'weight', a)
 
     def set_weight_shunt(self):
@@ -63,23 +74,16 @@ class Graph:
         waiting = set()
         infected.add(source)
         waiting.add(source)
-        weights = nx.get_edge_attributes(self.graph, 'weight')
         if scheme == 'random':
             while (waiting.__len__() < max_infected_number) and (waiting.__len__() < self.graph.number_of_nodes()):
                 for w in waiting:
                     neighbors = nx.all_neighbors(self.graph, w)
                     for u in neighbors:
                         if u not in infected:
-                            weight = 0
-                            if (w, u) in weights.keys():
-                                weight = weights[(w, u)]
-                            else:
-                                weight = weights[(u, w)]
+                            weight = self.get_weight(w,u)
                             if random.random() > weight:
                                 """u is infected successfully"""
                                 infected.add(u)
-                                if self.debug:
-                                    print u
                 waiting = infected.copy()
         elif scheme=='snowball':
             while (waiting.__len__() <= max_infected_number) and (waiting.__len__() <= self.graph.number_of_nodes()):
@@ -91,3 +95,11 @@ class Graph:
                 waiting = infected
         self.subgraph = self.graph.subgraph(infected)
         return infected
+
+    def get_weight(self, u, v):
+        weight = 0
+        if (u, v) in self.weights.keys():
+            weight = self.weights[(u, v)]
+        else:
+            weight = self.weights[(v, u)]
+        return weight
