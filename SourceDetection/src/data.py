@@ -8,7 +8,7 @@ created at 2017/1/7.
 import random
 
 import networkx as nx
-
+import matplotlib.pyplot as plt
 
 class Graph:
     graph = nx.Graph()
@@ -103,3 +103,17 @@ class Graph:
         else:
             weight = self.weights[(v, u)]
         return weight
+
+    def generate_random_graph(self, size):
+        g = nx.connected_watts_strogatz_graph(size, 10, 0.3)
+        print g.number_of_nodes(), g.number_of_edges()
+        g = nx.karate_club_graph()
+        print g.number_of_nodes(), g.number_of_edges()
+        print nx.adjacency_matrix(g, weight='weight').todense()
+        nx.write_gml(g, "../data/karate_club.gml")
+        # nx.draw_circular(g)
+        # plt.show()
+
+if __name__ == '__main__':
+    d = Graph()
+    d.generate_random_graph(100)

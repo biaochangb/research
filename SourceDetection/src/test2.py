@@ -24,31 +24,18 @@ print a[0,0]*b[0,0]+a[0,1]*b[1,0]
 print np.log(a).diagonal()
 
 d = data.Graph("../data/test.txt", weighted=1)
-a = nx.adjacency_matrix(d.graph)  # adjacent matrix
-aa = nx.adjacency_matrix(d.graph, weight=None)  # adjacent matrix
+a = nx.adjacency_matrix(d.graph).todense()  # adjacent matrix
+aa = nx.adjacency_matrix(d.graph, weight=None).todense()  # adjacent matrix
 
-weights = nx.get_edge_attributes(d.graph, 'weight')
+mu = np.zeros(d.graph.number_of_nodes())  # recover probability
+d = np.ones([5,5])
+print a
+print aa
+print np.dot(a,aa)
+print d[0], a.diagonal()
 
-c = np.ones([5,5])
-print a.todense(out=c)
-c = np.ones([5,5])
-print c
-print np.multiply(a.todense(),c)
-print d.graph.nodes()
-print d.node2index
-print weights
-print aa.todense()
+print np.tile(1,5)
 
-ps0 = np.random.rand(5)
-print ps0
-print np.tile(ps0, 5).reshape(5,5).T
-print nx.diameter(d.graph)
-x =  np.tile(ps0, 5).reshape(5,5).T
-x[1] = 0
-print x
-print np.arange(1,10)
-a = {}
-a[1] = np.asarray([1,2,3])
-a[2] = np.ones(3)
-a[3] = np.zeros(3)
-print sum(np.asarray(a.values())[:,2])
+x = np.asarray([[1,2],[3,4]])
+y = np.asarray([[2.0,2.0],[2.0,2.0]])
+print x[0][0], x[0,1]
