@@ -18,19 +18,24 @@ class Method:
     method_name = ''
     data = ''
 
-    def __init__(self, data):
+    def __init__(self):
+        self.method_name = self.__class__
+        self.reset_centrality()
+
+    def __init__(self):
         """
         Args:
             @type data: data.Graph
         """
+        self.method_name = self.__class__
+
+    def set_data(self, data):
         self.data = data
         self.subgraph = data.subgraph
-        self.method_name = self.__class__
         self.reset_centrality()
 
     def reset_centrality(self):
         """reset the centrality for every node."""
-        self.subgraph = self.data.subgraph
         centrality = {u: 0 for u in nx.nodes(self.subgraph)}
         nx.set_node_attributes(self.subgraph, 'centrality', centrality)
 

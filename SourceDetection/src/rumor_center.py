@@ -36,12 +36,15 @@ class RumorCenter(method.Method):
             return
 
         self.reset_centrality()
-        self.source = self.subgraph.nodes()[0]  # the initial node
-        self.bfs_tree = nx.bfs_tree(self.subgraph, self.source)
-        self.visited.clear()
-        self.get_number_in_subtree(self.source)
-        self.visited.clear()
-        self.get_centrality(self.source)
+        centrality = {}
+        for source in self.subgraph.nodes():
+            self.bfs_tree = nx.bfs_tree(self.subgraph, source)
+            self.visited.clear()
+            self.get_number_in_subtree(source)
+            centrality[source] = Decimal(math.factorial(self.bfs_tree.number_of_nodes())) \
+                         / nx.get_node_attributes(self.bfs_tree, 'cumulativeProductOfSubtrees')[source]
+
+        nx.set_node_attributes(self.subgraph, 'centrality',centrality)
         return self.sort_nodes_by_centrality()
 
     def get_centrality(self, u):
@@ -54,13 +57,14 @@ class RumorCenter(method.Method):
         centrality = 0
         if u == self.source:
             """p is the root node in the bfs_tree."""
-            centrality = math.factorial(self.bfs_tree.number_of_nodes()) \
+            centrality = Decimal(math.factorial(self.bfs_tree.number_of_nodes())) \
                          / nx.get_node_attributes(self.bfs_tree, 'cumulativeProductOfSubtrees')[u]
         else:
             parent = nx.get_node_attributes(self.bfs_tree, 'parent')[u]
             numberOfNodesInSubtree = nx.get_node_attributes(self.bfs_tree, 'numberOfNodesInSubtree')[u]
             centrality = nx.get_node_attributes(self.bfs_tree, 'centrality')[parent] * numberOfNodesInSubtree / (
                 self.bfs_tree.number_of_nodes() - numberOfNodesInSubtree)
+        centrality = centrality
         nx.set_node_attributes(self.bfs_tree, 'centrality', {u: centrality})
         nx.set_node_attributes(self.subgraph, 'centrality', {u: centrality})
 
@@ -89,6 +93,6 @@ class RumorCenter(method.Method):
                 self.get_number_in_subtree(u)
                 numberOfNodesInSubtree += nx.get_node_attributes(self.bfs_tree, 'numberOfNodesInSubtree')[u]
                 cumulativeProductOfSubtrees *= nx.get_node_attributes(self.bfs_tree, 'cumulativeProductOfSubtrees')[u]
-        cumulativeProductOfSubtrees *= numberOfNodesInSubtree
+        cumulativeProductOfSubtrees = Decimal(cumulativeProductOfSubtrees)*Decimal(numberOfNodesInSubtree)
         nx.set_node_attributes(self.bfs_tree, 'numberOfNodesInSubtree', {p: numberOfNodesInSubtree})
         nx.set_node_attributes(self.bfs_tree, 'cumulativeProductOfSubtrees', {p: cumulativeProductOfSubtrees})

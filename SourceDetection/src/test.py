@@ -6,138 +6,145 @@ created at 2017/1/9.
 
 # coding=utf-8
 
+import pickle
 import random
 from time import clock
 
 import networkx as nx
+import numpy as np
 
-import data
+import data as mydata
 import distance_center as dc
+import dmp2
 import dynamic_importance as di
 import dynamic_message_passing as dmp
 import jordan_center as jc
 import map_gsba as gsba
 import reverse_infection as ri
 import rumor_center as rc
-import dmp2
+
 
 class Experiment:
     precision = {}  # Detection Rate
     error = {}  # Detection Error
     topological_error = {}  # Detection topological Error
     ranking = {}  # Normalized Ranking
+    running_time = {}
     methods = []
 
-    def initialize_evaluation_measures(self):
-        self.precision['full_test'] = {}
-        self.precision['random_test'] = {}
-        self.error['full_test'] = {}
-        self.error['random_test'] = {}
-        self.topological_error['full_test'] = {}
-        self.topological_error['random_test'] = {}
-        self.ranking['full_test'] = {}
-        self.ranking['random_test'] = {}
+    def initialize_evaluation_measures(self, test_category):
+        self.precision[test_category] = {}
+        self.error[test_category] = {}
+        self.topological_error[test_category] = {}
+        self.ranking[test_category] = {}
+        self.running_time[test_category] = {}
         for m in self.methods:
-            self.precision['full_test'][m.method_name] = list()
-            self.precision['random_test'][m.method_name] = list()
-            self.error['full_test'][m.method_name] = list()
-            self.error['random_test'][m.method_name] = list()
-            self.topological_error['full_test'][m.method_name] = list()
-            self.topological_error['random_test'][m.method_name] = list()
-            self.ranking['full_test'][m.method_name] = list()
-            self.ranking['random_test'][m.method_name] = list()
+            self.precision[test_category][m.method_name] = list()
+            self.error[test_category][m.method_name] = list()
+            self.topological_error[test_category][m.method_name] = list()
+            self.ranking[test_category][m.method_name] = list()
 
-    def detection_test(self, d, random_test=False, random_num=1):
+    def detection_test(self, network, test_category, infected_size, test_num=1):
         """Full test: each node is selected to be the source
             Random test: randomly select a node as the infection source
         """
-        test = 'full_test'
+        """Read the network and generate source nodes according to the test category"""
+        d = mydata.Graph("../data/%s" % network, weighted=1)
         nodes = d.graph.nodes()
-        number_of_nodes = len(nodes)
-        if random_test:
-            test = 'random_test'
-            """randomly select the sources"""
-            temp = list()
+        n = d.graph.number_of_nodes()
+        sources = list()  # source nodes' index
+        self.initialize_evaluation_measures(test_category)
+        if test_category == 'random_test':
             v = 0
-            while v < random_num:
-                temp.append(nodes[random.randint(0, number_of_nodes - 1)])
+            while v < test_num:
+                sources.append(random.randint(0, n - 1))
                 v += 1
-            nodes = temp
-            number_of_nodes = len(nodes)
-        i = 0
-        p = 0.1
-        print test, len(nodes)
-        for s in nodes:
-            i += 1
-            if abs(i - number_of_nodes * p) < 1:
-                print '\t percentage: ', p
-                p += 0.1
-            infected = d.infect_from_source_SI(s)
-            if d.debug:
-                print 'source = ', s, infected
-            for m in methods:
+        else:
+            sources = np.arange(0, n)
+        n = len(sources)
+
+        """run the test"""
+        print test_category, len(nodes), d.graph.number_of_edges(), infected_size, test_num
+        for m in self.methods:
+            print '\t', m.method_name
+            start_time = clock()
+            percentage = 0.2
+            i = 0
+            for s in sources:
+                i += 1
+                if abs(i - n * percentage) < 1:
+                    print '\t\t percentage: ', percentage
+                    percentage += 0.2
+                file = "../data/simulation/%s.i%s.s%s.subgraph" % (network, infected_size, s)
+                reader = open(file, "r")
+                data = pickle.load(reader)
+                """@type data: mydata.Graph"""
+                reader.close()
+                data.weights = d.weights
+                m.set_data(data)
                 result = m.detect()
                 """evaluate the result"""
                 if len(result) > 0:
-                    if d.debug:
-                        print result[0][0], result[0][1], result, m.method_name
-                    if result[0][0] == s:
-                        self.precision[test][m.method_name].append(1)
+                    if result[0][0] == nodes[s]:
+                        self.precision[test_category][m.method_name].append(1)
                     else:
-                        self.precision[test][m.method_name].append(0)
-                    # error['full_test'][m.method_name].append(distances[result[0][0]][s])
-                    # topological_error['full_test'][m.method_name].append(topological_distances[result[0][0]][s])
-                    self.error[test][m.method_name].append(
-                        nx.dijkstra_path_length(d.subgraph, result[0][0], s, weight='weight'))
-                    self.topological_error[test][m.method_name].append(
-                        nx.dijkstra_path_length(d.subgraph, result[0][0], s, weight=None))
+                        self.precision[test_category][m.method_name].append(0)
+                    self.error[test_category][m.method_name].append(
+                        nx.dijkstra_path_length(d.subgraph, result[0][0], nodes[s], weight='weight'))
+                    self.topological_error[test_category][m.method_name].append(
+                        nx.dijkstra_path_length(d.subgraph, result[0][0], nodes[s], weight=None))
                     r = 0
                     for u in result:
                         r += 1
-                        if u[0] == s:
-                            self.ranking[test][m.method_name].append(r)
+                        if u[0] == nodes[s]:
+                            self.ranking[test_category][m.method_name].append(r)
                             break
+            end_time = clock()
+            self.running_time[test_category][m.method_name] = end_time - start_time
 
-    def print_result(self, test):
-        for m in methods:
-            l = len(self.precision[test][m.method_name]) + 1.0
-            print sum(self.precision[test][m.method_name]) / l, sum(self.error[test][m.method_name]) / l, sum(
-                self.topological_error[test][m.method_name]) / l, sum(self.ranking[test][m.method_name]) / l, m.method_name
+    def print_result(self, test_category):
+        for m in self.methods:
+            l = len(self.precision[test_category][m.method_name]) + 1.0
+            print sum(self.precision[test_category][m.method_name]) / l, sum(
+                self.error[test_category][m.method_name]) / l, sum(
+                self.topological_error[test_category][m.method_name]) / l, sum(
+                self.ranking[test_category][m.method_name]) / l, self.running_time[test_category][
+                m.method_name], m.method_name
+
 
 if __name__ == '__main__':
     experiment = Experiment()
-    start_time = clock()
     print "Starting..."
-    d = data.Graph("../data/test.txt", weighted=1)
-    # d = data.Graph("../data/power-grid.txt")
-    d = data.Graph("../data/karate_club.gml")
-    d.debug = False
-    d.ratio_infected = 1
-    random_num= 1 * d.graph.number_of_nodes()
-    random_num = 1
 
-    print 'Graph size: ', d.graph.number_of_nodes(), d.graph.number_of_edges(), d.graph.number_of_nodes() * d.ratio_infected
-    weight = nx.get_edge_attributes(d.graph, 'weight')
-    if d.debug:
-        print weight
-
-    methods = [rc.RumorCenter(d), di.DynamicImportance(d), dc.DistanceCenter(d),
-               jc.JordanCenter(d), ri.ReverseInfection(d), dmp.DynamicMessagePassing(d), gsba.GSBA(d)]
-    methods = [dmp.DynamicMessagePassing(d), gsba.GSBA(d) ]
-    methods = [dmp2.DynamicMessagePassing(d), gsba.GSBA(d) ]
+    prior_detector1 = rc.RumorCenter()
+    prior_detector2 = dmp2.DynamicMessagePassing()
+    prior_detector3 = dc.DistanceCenter()
+    prior_detector4 = jc.JordanCenter()
+    prior_detector5 = ri.ReverseInfection()
+    methods = [rc.RumorCenter(), di.DynamicImportance(), dc.DistanceCenter(),
+               jc.JordanCenter(), ri.ReverseInfection(), dmp.DynamicMessagePassing(), gsba.GSBA(prior_detector1)]
+    methods = [rc.RumorCenter(), di.DynamicImportance(), dc.DistanceCenter(),
+               jc.JordanCenter(), ri.ReverseInfection(), dmp2.DynamicMessagePassing(), gsba.GSBA(prior_detector1)]
+    methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(), ri.ReverseInfection(),
+               gsba.GSBA(prior_detector1),gsba.GSBA(prior_detector2), gsba.GSBA(prior_detector3),
+               gsba.GSBA(prior_detector4), gsba.GSBA(prior_detector5),dmp2.DynamicMessagePassing()]
+    #methods = [ gsba.GSBA(prior_detector3)]
     experiment.methods = methods
-    experiment.initialize_evaluation_measures()
 
+    random_num = 10
+    infected_size = 30
+    networks = {'sw.v100e500': 'small-world.ws.v100.e500.gml', 'power-grid':'power-grid.gml'}
+    net = 'sw.v100e500'
+    test_category = 'random_test'
     initialize_time = clock()
-    #experiment.detection_test(d)
-    full_test_time = clock()
+    experiment.detection_test(networks[net], test_category, infected_size, test_num=random_num)
+    test_time = clock()
+    experiment.print_result(test_category)
+    print "Runing time:", (test_time - initialize_time)
 
-    experiment.detection_test(d, random_test=True, random_num=random_num)
-    random_test_time = clock()
-    print "Runing time:", start_time, (initialize_time - start_time), (full_test_time - initialize_time), (
-    random_test_time - full_test_time)
-
-    test = "full_test"
-    experiment.print_result(test)
-    test = "random_test"
-    experiment.print_result(test)
+    # test_category = 'full_test'
+    # initialize_time = clock()
+    # experiment.detection_test(networks[net], test_category, infected_size, test_num=random_num)
+    # test_time = clock()
+    # experiment.print_result(test_category)
+    # print "Runing time:", (test_time - initialize_time)

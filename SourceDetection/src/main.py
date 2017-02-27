@@ -19,6 +19,8 @@ import jordan_center as jc
 import map_gsba as gsba
 import reverse_infection as ri
 import rumor_center as rc
+import dmp2
+import map_bfsa as bfsa
 
 class Experiment:
     precision = {}  # Detection Rate
@@ -26,6 +28,7 @@ class Experiment:
     topological_error = {}  # Detection topological Error
     ranking = {}  # Normalized Ranking
     methods = []
+    propagation_model = 'IC'
 
     def initialize_evaluation_measures(self):
         self.precision['full_test'] = {}
@@ -71,15 +74,19 @@ class Experiment:
             if abs(i - number_of_nodes * p) < 1:
                 print '\t percentage: ', p
                 p += 0.1
-            infected = d.infect_from_source_SI(s)
+            if self.propagation_model == 'IC':
+                infected = d.infect_from_source_IC(s)
+            elif self.propagation_model == 'SI':
+                infected = d.infect_from_source_SI(s)
+            if infected.__len__()<=1:
+                continue
             if d.debug:
                 print 'source = ', s, infected
             for m in methods:
+                m.set_data(d)
                 result = m.detect()
                 """evaluate the result"""
                 if len(result) > 0:
-                    if d.debug:
-                        print result[0][0], result[0][1], result, m.method_name
                     if result[0][0] == s:
                         self.precision[test][m.method_name].append(1)
                     else:
@@ -99,37 +106,51 @@ class Experiment:
 
     def print_result(self, test):
         for m in methods:
-            l = len(self.precision[test][m.method_name]) + 1.0
+            l = len(self.precision[test][m.method_name])*1.0
+            if l==0 : continue
             print sum(self.precision[test][m.method_name]) / l, sum(self.error[test][m.method_name]) / l, sum(
-                self.topological_error[test][m.method_name]) / l, sum(self.ranking[test][m.method_name]) / l, m.method_name
+                self.topological_error[test][m.method_name]) / l, sum(self.ranking[test][m.method_name]) / l, m.method_name, l
 
 if __name__ == '__main__':
     experiment = Experiment()
     start_time = clock()
     print "Starting..."
     d = data.Graph("../data/test.txt", weighted=1)
-    # d = data.Graph("../data/power-grid.txt")
-    d = data.Graph("../data/karate_club.gml")
+    # d = data.Graph("../data/karate_club.gml")
+    # d = data.Graph("../data/small-world.ws.v100.e500.gml", weighted=1)
+    # d = data.Graph("../data/scale-free.ba.v500.e996.gml", weighted=1)
+    #d = data.Graph("../data/power-grid.txt")
     d.debug = False
-    d.ratio_infected = 0.8
-    random_num= 5 * d.graph.number_of_nodes()
+    d.ratio_infected = 1
+    random_num= 0.1 * d.graph.number_of_nodes()
+    random_num = 1
+    experiment.propagation_model = 'SI'
 
     print 'Graph size: ', d.graph.number_of_nodes(), d.graph.number_of_edges(), d.graph.number_of_nodes() * d.ratio_infected
     weight = nx.get_edge_attributes(d.graph, 'weight')
     if d.debug:
         print weight
+    prior_detector1 = rc.RumorCenter()
+    prior_detector2 = dmp2.DynamicMessagePassing()
+    prior_detector3 = dc.DistanceCenter()
+    prior_detector4 = jc.JordanCenter()
+    prior_detector5 = ri.ReverseInfection()
+    methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(),ri.ReverseInfection(),prior_detector2,
+               gsba.GSBA( prior_detector1),gsba.GSBA(prior_detector2), gsba.GSBA( prior_detector3),
+               gsba.GSBA(prior_detector4), gsba.GSBA( prior_detector5)]
+    methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(),ri.ReverseInfection(),di.DynamicImportance(),
+               gsba.GSBA( prior_detector1), gsba.GSBA( prior_detector3),
+               gsba.GSBA(prior_detector4), gsba.GSBA( prior_detector5)]
+    methods = [bfsa.BFSA(prior_detector1)]
 
-    methods = [rc.RumorCenter(d), di.DynamicImportance(d), dc.DistanceCenter(d),
-               jc.JordanCenter(d), ri.ReverseInfection(d), dmp.DynamicMessagePassing(d), gsba.GSBA(d)]
-    #methods = [dmp.DynamicMessagePassing(d), gsba.GSBA(d) ]
     experiment.methods = methods
     experiment.initialize_evaluation_measures()
 
     initialize_time = clock()
-    experiment.detection_test(d)
+    #experiment.detection_test(d)
     full_test_time = clock()
 
-    #experiment.detection_test(d, random_test=True, random_num=random_num)
+    experiment.detection_test(d, random_test=True, random_num=random_num)
     random_test_time = clock()
     print "Runing time:", start_time, (initialize_time - start_time), (full_test_time - initialize_time), (
     random_test_time - full_test_time)

@@ -30,5 +30,6 @@ class JordanCenter(method.Method):
         for u in nx.nodes(self.subgraph):
             row = dict(distances[u])
             k = max(row, key=row.get)
-            nx.set_node_attributes(self.subgraph, 'centrality', {u: 1.0 / row[k]})
+            centrality[u] = 1.0 / row[k]
+        nx.set_node_attributes(self.subgraph, 'centrality', centrality)
         return self.sort_nodes_by_centrality()

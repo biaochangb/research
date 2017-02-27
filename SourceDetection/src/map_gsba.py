@@ -6,19 +6,27 @@ created at 2017/1/18.
 
 # coding=utf-8
 
+import decimal
+
 import networkx as nx
 
 import method
 import rumor_center
-import decimal
+import math
+from blist import blist
+
 
 class GSBA(method.Method):
     """detect the source with Greedy Search Bound Approximation.
         Please refer to the my paper for more details.
     """
-
-    rc = ''
     prior = ''
+    prior_detector = None
+
+    def __init__(self, prior_detector):
+        method.Method.__init__(self)
+        self.method_name = self.__class__, prior_detector.method_name
+        self.prior_detector = prior_detector
 
     def detect(self):
         """detect the source with GSBA.
@@ -28,34 +36,38 @@ class GSBA(method.Method):
             the detected source
         """
         self.reset_centrality()
-        self.rc = rumor_center.RumorCenter(self.data)
-        self.rc.detect()
+        self.prior_detector.set_data(self.data)
+        self.prior_detector.detect()
         self.prior = nx.get_node_attributes(self.subgraph, 'centrality')
-        if self.data.debug:
-            print self.prior
-            print self.data.subgraph.edges()
-            print self.data.weights
-        self.rc.reset_centrality()
 
-        p_sigma_upper = {}  # upper bound of the probability of a permitted permutation
+        self.reset_centrality()
+        rc = rumor_center.RumorCenter()
+        rc.set_data(self.data)
+        rc.detect()
+        rumor_centralities = nx.get_node_attributes(self.subgraph, 'centrality')
+
+        self.reset_centrality()
         infected_nodes = self.subgraph.nodes()
         n = len(infected_nodes)
+        posterior = {}
+        included = set()
+        neighbours = set()
+        weights = self.data.weights
         for v in infected_nodes:
             """find the approximate upper bound by greedy searching"""
-            upper = 0
-            included = set()
-            neighbours = set()
+            included.clear()
+            neighbours.clear()
             included.add(v)
             neighbours.add(v)
             likelihood = 1
-            w = {} # effective propagation probabilities: node->w
-            w_key_sorted = []
+            w = {}  # effective propagation probabilities: node->w
+            w_key_sorted = blist()
             w[v] = 1
             w_key_sorted.append(v)
-            while len(included)<n:
+            while len(included) < n:
                 w_sum = sum([w[j] for j in neighbours])
                 u = w_key_sorted.pop()  # pop out the last element from w_key_sorted with the largest w
-                likelihood *= w[u]/w_sum
+                likelihood *= w[u] / w_sum
                 included.add(u)
                 neighbours.remove(u)
                 new = nx.neighbors(self.data.graph, u)
@@ -63,24 +75,28 @@ class GSBA(method.Method):
                     if h in included:
                         continue
                     # compute w for h
-                    h_neighbor = nx.neighbors(self.data.graph, h)
-                    w_h = 1
-                    for be in included.intersection(h_neighbor):
-                        w_h *= 1-self.data.get_weight(h, be)
-                    w[h] = 1 - w_h
+                    w_h2u = weights[self.data.node2index[u], self.data.node2index[h]]
+                    if h in w.keys():
+                        w[h] = 1-(1-w[h])*(1-w_h2u)
+                    else:
+                        w[h] = w_h2u
+                    # h_neighbor = nx.neighbors(self.data.graph, h)
+                    # w_h = 1
+                    # for be in included.intersection(h_neighbor):
+                    #     w_h *= 1 - self.data.get_weight(h, be)
+                    # w[h] = 1 - w_h
                     """insert h into w_key_sorted, ranking by w from small to large"""
                     if h in infected_nodes:
+                        if h in w_key_sorted:
+                            w_key_sorted.remove(h)  # remove the old w[h]
                         k = 0
-                        while k<len(w_key_sorted):
-                            if w[w_key_sorted[k]]>w[h]:
+                        while k < len(w_key_sorted):
+                            if w[w_key_sorted[k]] > w[h]:
                                 break
                             k += 1
-                        if h in w_key_sorted:
-                            w_key_sorted.remove(h)
-                        w_key_sorted[k:k] = [h]
+                        w_key_sorted.insert(k,h)
+                        #w_key_sorted[k:k] = [h]
                 neighbours = neighbours.union(new)
-            self.prior[v] = self.prior[v]*decimal.Decimal(likelihood)*self.prior[v]
-            #self.prior[v] = self.prior[v]*decimal.Decimal(1)*self.prior[v]
-        nx.set_node_attributes(self.subgraph, 'centrality', self.prior)
+            posterior[v] = (decimal.Decimal(self.prior[v])* decimal.Decimal(likelihood) * rumor_centralities[v])
+        nx.set_node_attributes(self.subgraph, 'centrality', posterior)
         return self.sort_nodes_by_centrality()
-

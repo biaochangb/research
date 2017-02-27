@@ -9,6 +9,7 @@ created at 2017/2/9.
 import numpy as np
 import networkx as nx
 import scipy as sp
+import math
 
 import data
 
@@ -39,3 +40,19 @@ print np.tile(1,5)
 x = np.asarray([[1,2],[3,4]])
 y = np.asarray([[2.0,2.0],[2.0,2.0]])
 print x[0][0], x[0,1]
+
+print math.factorial(1000)
+print np.arange(0,10)
+
+import collections
+d = collections.OrderedDict()
+d['a'] = 20
+d['b'] = 10
+d['c'] = 30
+print collections.OrderedDict(sorted(d.items(), key=lambda t: t[1]))
+
+g = nx.barabasi_albert_graph(500, 2)
+print g.number_of_nodes(), g.number_of_edges()
+print nx.adjacency_matrix(g, weight='weight').todense()
+
+print np.arange(0,3)
