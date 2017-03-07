@@ -1,10 +1,9 @@
+# coding=utf-8
 """
 A part of Source Detection.
 Author: Biao Chang, changb110@gmail.com, from University of Science and Technology of China
-created at 2017/1/18.
+created at 2017/1/9.
 """
-
-# coding=utf-8
 
 import decimal
 
@@ -47,7 +46,7 @@ class GSBA(method.Method):
         rumor_centralities = nx.get_node_attributes(self.subgraph, 'centrality')
 
         self.reset_centrality()
-        infected_nodes = self.subgraph.nodes()
+        infected_nodes = set(self.subgraph.nodes())
         n = len(infected_nodes)
         posterior = {}
         included = set()
@@ -75,7 +74,7 @@ class GSBA(method.Method):
                     if h in included:
                         continue
                     # compute w for h
-                    w_h2u = weights[self.data.node2index[u], self.data.node2index[h]]
+                    w_h2u = weights[self.data.node2index[u]][self.data.node2index[h]]
                     if h in w.keys():
                         w[h] = 1-(1-w[h])*(1-w_h2u)
                     else:

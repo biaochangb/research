@@ -1,10 +1,10 @@
+# coding=utf-8
 """
 A part of Source Detection.
 Author: Biao Chang, changb110@gmail.com, from University of Science and Technology of China
-created at 2017/1/7.
+created at 2017/1/9.
 """
 
-# coding=utf-8
 import pickle
 import random
 
@@ -47,7 +47,7 @@ class Graph:
             elif path.endswith('.txt'):
                 self.graph = nx.read_weighted_edgelist(path, comments=comments)
         self.subgraph = self.graph
-        self.weights = nx.adjacency_matrix(self.graph, weight='weight').todense()
+        self.weights = nx.adjacency_matrix(self.graph, weight='weight').todense().tolist()
         i = 0
         for v in self.graph.nodes():
             self.node2index[v] = i
@@ -65,13 +65,15 @@ class Graph:
         """  weight_i =  1/degree(i)
         """
 
-    def infect_from_source_IC(self, source, scheme='random'):
+    def infect_from_source_IC(self, source, scheme='random', infected_size=None):
         """
         diffuse by the IC model.
         three most common propagation schemes: snowball, random walk and contact process
         Returns: the nodes being infected
         """
         max_infected_number = self.ratio_infected * self.graph.number_of_nodes()
+        if infected_size is not None:
+            max_infected_number = infected_size
         infected = set()
         activated_current = set()
         activated_next = set()
@@ -87,7 +89,7 @@ class Graph:
                     neighbors = nx.all_neighbors(self.graph, w)
                     for u in neighbors:
                         if u not in infected:
-                            weight = self.weights[self.node2index[w], self.node2index[u]]
+                            weight = self.weights[self.node2index[w]][self.node2index[u]]
                             if random.random() <= weight:
                                 """u is infected successfully"""
                                 infected.add(u)
@@ -109,13 +111,15 @@ class Graph:
         self.subgraph = self.graph.subgraph(infected)
         return infected
 
-    def infect_from_source_SI(self, source, scheme='random'):
+    def infect_from_source_SI(self, source, scheme='random',infected_size=None):
         """
         diffuse by the SI model.
         three most common propagation schemes: snowball, random walk and contact process
         Returns: the nodes being infected
         """
         max_infected_number = self.ratio_infected * self.graph.number_of_nodes()
+        if infected_size is not None:
+            max_infected_number = infected_size
         infected = set()
         waiting = set()
         infected.add(source)
@@ -130,7 +134,7 @@ class Graph:
                     neighbors = nx.all_neighbors(self.graph, w)
                     for u in neighbors:
                         if u not in infected:
-                            weight = self.weights[self.node2index[w], self.node2index[u]]
+                            weight = self.weights[self.node2index[w]][self.node2index[u]]
                             if random.random() <= weight:
                                 """u is infected successfully"""
                                 infected.add(u)
@@ -169,6 +173,11 @@ class Graph:
         # g = nx.read_edgelist("../data/power.gml", comments='#')
         # file = "../data/power-grid.gml"
 
+        g = nx.read_edgelist("../data/Wiki-Vote.txt", comments='#')
+        file = "../data/Wiki-Vote.gml"
+
+        g = max(nx.connected_component_subgraphs(g), key=len)
+
         a = {e: random.random() for e in g.edges_iter()}
         nx.set_edge_attributes(g, 'weight', a)
         print g.number_of_nodes(), g.number_of_edges(), file
@@ -190,13 +199,3 @@ class Graph:
             pickle.dump(self, writer)
             writer.close()
             i += 1
-
-
-if __name__ == '__main__':
-    ratio_infected = 0.3
-    input_file = "../data/small-world.ws.v100.e500.gml"
-    output_file = "../data/simulation/small-world.ws.v100.e500.gml"
-    d = Graph(input_file, weighted=1)
-    d.generate_random_graph(100)
-
-    # d.generate_infected_subgraph(output_file, ratio_infected)

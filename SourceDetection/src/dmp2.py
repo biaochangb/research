@@ -1,10 +1,10 @@
+# coding=utf-8
 """
 A part of Source Detection.
 Author: Biao Chang, changb110@gmail.com, from University of Science and Technology of China
-created at 2017/1/10.
+created at 2017/1/9.
 """
 
-# coding=utf-8
 import networkx as nx
 import numpy as np
 
@@ -31,7 +31,7 @@ class DynamicMessagePassing(method.Method):
         n = self.data.graph.number_of_nodes()
         n_i = self.subgraph.number_of_nodes()
         a = nx.adjacency_matrix(self.data.graph, weight=None).todense()  # adjacent matrix
-        weights = nx.adjacency_matrix(self.data.graph, weight='weight').todense()  # infection probability
+        weights = np.asarray(self.data.weights) # infection probability
         mu = np.zeros(n)  # recover probability
         diameter = 1* nx.diameter(self.subgraph)
         likelihoods = {}  # the likelihood, P(o|i), in Eq. 21.
@@ -100,4 +100,5 @@ class DynamicMessagePassing(method.Method):
         for v in np.arange(n_i):
             centrality[nodes_infected[v]] = likelihoods[v][t0]
         nx.set_node_attributes(self.subgraph, 'centrality', centrality)
+        del theta, phi, pij_s, p_sir, ps0
         return self.sort_nodes_by_centrality()

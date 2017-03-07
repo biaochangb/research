@@ -1,10 +1,9 @@
+# coding=utf-8
 """
 A part of Source Detection.
 Author: Biao Chang, changb110@gmail.com, from University of Science and Technology of China
 created at 2017/1/9.
 """
-
-# coding=utf-8
 
 import pickle
 import random
@@ -45,10 +44,10 @@ class Experiment:
             self.ranking[test_category][m.method_name] = list()
 
     def detection_test(self, network, test_category, infected_size, test_num=1):
-        """Full test: each node is selected to be the source
-            Random test: randomly select a node as the infection source
+        """Full test_category: each node is selected to be the source
+            Random test_category: randomly select a node as the infection source
         """
-        """Read the network and generate source nodes according to the test category"""
+        """Read the network and generate source nodes according to the test_category category"""
         d = mydata.Graph("../data/%s" % network, weighted=1)
         nodes = d.graph.nodes()
         n = d.graph.number_of_nodes()
@@ -63,7 +62,7 @@ class Experiment:
             sources = np.arange(0, n)
         n = len(sources)
 
-        """run the test"""
+        """run the test_category"""
         print test_category, len(nodes), d.graph.number_of_edges(), infected_size, test_num
         for m in self.methods:
             print '\t', m.method_name

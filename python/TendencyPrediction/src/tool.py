@@ -8,7 +8,7 @@ from dataset import *
 def myprint(ss):
     global gc
     gc = ss
-    print 'test', ss
+    print 'test_category', ss
 
 
 gY_D = []

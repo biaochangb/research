@@ -1,10 +1,9 @@
+# coding=utf-8
 """
 A part of Source Detection.
 Author: Biao Chang, changb110@gmail.com, from University of Science and Technology of China
-created at 2017/1/8.
+created at 2017/1/9.
 """
-
-# coding=utf-8
 
 import math
 from decimal import *

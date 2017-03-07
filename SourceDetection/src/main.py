@@ -1,13 +1,14 @@
+# coding=utf-8
 """
 A part of Source Detection.
 Author: Biao Chang, changb110@gmail.com, from University of Science and Technology of China
 created at 2017/1/9.
 """
 
-# coding=utf-8
-
 import random
 from time import clock
+import log
+import logging
 
 import networkx as nx
 
@@ -20,7 +21,10 @@ import map_gsba as gsba
 import reverse_infection as ri
 import rumor_center as rc
 import dmp2
+import map_bfsa_parallel as bfsa_p
 import map_bfsa as bfsa
+import prior
+import numpy as np
 
 class Experiment:
     precision = {}  # Detection Rate
@@ -29,6 +33,7 @@ class Experiment:
     ranking = {}  # Normalized Ranking
     methods = []
     propagation_model = 'IC'
+    logger = logging.getLogger()
 
     def initialize_evaluation_measures(self):
         self.precision['full_test'] = {}
@@ -50,8 +55,8 @@ class Experiment:
             self.ranking['random_test'][m.method_name] = list()
 
     def detection_test(self, d, random_test=False, random_num=1):
-        """Full test: each node is selected to be the source
-            Random test: randomly select a node as the infection source
+        """Full test_category: each node is selected to be the source
+            Random test_category: randomly select a node as the infection source
         """
         test = 'full_test'
         nodes = d.graph.nodes()
@@ -101,35 +106,28 @@ class Experiment:
                     for u in result:
                         r += 1
                         if u[0] == s:
-                            self.ranking[test][m.method_name].append(r)
+                            self.ranking[test][m.method_name].append(r*1.0/len(result))
                             break
 
     def print_result(self, test):
+        self.logger.info(self.precision)
+        self.logger.info(self.error)
+        self.logger.info(self.topological_error)
+        self.logger.info(self.ranking)
         for m in methods:
             l = len(self.precision[test][m.method_name])*1.0
             if l==0 : continue
-            print sum(self.precision[test][m.method_name]) / l, sum(self.error[test][m.method_name]) / l, sum(
+            r = sum(self.precision[test][m.method_name]) / l, sum(self.error[test][m.method_name]) / l, sum(
                 self.topological_error[test][m.method_name]) / l, sum(self.ranking[test][m.method_name]) / l, m.method_name, l
+            print r
+            logger.info(r)
 
 if __name__ == '__main__':
+    logger = log.Logger(logname='../data/main.log', loglevel=logging.INFO, logger="experiment").get_log()
     experiment = Experiment()
-    start_time = clock()
-    print "Starting..."
-    d = data.Graph("../data/test.txt", weighted=1)
-    # d = data.Graph("../data/karate_club.gml")
-    # d = data.Graph("../data/small-world.ws.v100.e500.gml", weighted=1)
-    # d = data.Graph("../data/scale-free.ba.v500.e996.gml", weighted=1)
-    #d = data.Graph("../data/power-grid.txt")
-    d.debug = False
-    d.ratio_infected = 1
-    random_num= 0.1 * d.graph.number_of_nodes()
-    random_num = 1
-    experiment.propagation_model = 'SI'
+    experiment.logger = logger
 
-    print 'Graph size: ', d.graph.number_of_nodes(), d.graph.number_of_edges(), d.graph.number_of_nodes() * d.ratio_infected
-    weight = nx.get_edge_attributes(d.graph, 'weight')
-    if d.debug:
-        print weight
+    prior_detector0 = prior.Uniform()
     prior_detector1 = rc.RumorCenter()
     prior_detector2 = dmp2.DynamicMessagePassing()
     prior_detector3 = dc.DistanceCenter()
@@ -138,24 +136,60 @@ if __name__ == '__main__':
     methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(),ri.ReverseInfection(),prior_detector2,
                gsba.GSBA( prior_detector1),gsba.GSBA(prior_detector2), gsba.GSBA( prior_detector3),
                gsba.GSBA(prior_detector4), gsba.GSBA( prior_detector5)]
-    methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(),ri.ReverseInfection(),di.DynamicImportance(),
-               gsba.GSBA( prior_detector1), gsba.GSBA( prior_detector3),
-               gsba.GSBA(prior_detector4), gsba.GSBA( prior_detector5)]
-    methods = [bfsa.BFSA(prior_detector1)]
-
+    methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(), ri.ReverseInfection(), di.DynamicImportance(), prior_detector2,
+               gsba.GSBA(prior_detector0), gsba.GSBA(prior_detector1), gsba.GSBA( prior_detector3),
+               gsba.GSBA(prior_detector4), gsba.GSBA( prior_detector5), gsba.GSBA(prior_detector2), bfsa_p.BFSA(prior_detector1)]
+    #methods = [bfsa_p.BFSA(prior_detector1)]
+    # methods = [dmp2.DynamicMessagePassing()]
     experiment.methods = methods
-    experiment.initialize_evaluation_measures()
 
-    initialize_time = clock()
-    #experiment.detection_test(d)
-    full_test_time = clock()
+    start_time = clock()
+    print "Starting..."
+    d = data.Graph("../data/test_category.txt", weighted=1)
+    # d = data.Graph("../data/karate_club.gml")
+    # d = data.Graph("../data/small-world.ws.v100.e500.gml", weighted=1)
+    d = data.Graph("../data/scale-free.ba.v500.e996.gml", weighted=1)
+    #d = data.Graph("../data/power-grid.txt")
+    d.debug = False
+    random_num = 100
+    experiment.propagation_model = 'SI'
 
-    experiment.detection_test(d, random_test=True, random_num=random_num)
-    random_test_time = clock()
-    print "Runing time:", start_time, (initialize_time - start_time), (full_test_time - initialize_time), (
-    random_test_time - full_test_time)
+    print 'Graph size: ', d.graph.number_of_nodes(), d.graph.number_of_edges()
+    test = "random_test"
+    d.ratio_infected = 0.006
+    logger.info(test)
+    for i in np.arange(0,-1):
+        experiment.initialize_evaluation_measures()
+        str = 'd.ratio_infected', d.ratio_infected, d.ratio_infected*d.graph.number_of_nodes()
+        logger.info(str)
+        print str
+        s_time = clock()
+        experiment.detection_test(d, random_test=True, random_num=random_num)
+        e_time = clock()
+        print "Running time:", e_time-s_time
+        logger.info(("Running time:", e_time-s_time))
+        experiment.print_result(test)
+        d.ratio_infected += 0.002
+        print '\n'
+        logger.info('\n')
 
     test = "full_test"
-    experiment.print_result(test)
-    test = "random_test"
-    experiment.print_result(test)
+    d.ratio_infected = 0.018
+    logger.info(test)
+    for i in np.arange(0,4):
+        experiment.initialize_evaluation_measures()
+        str = 'd.ratio_infected', d.ratio_infected, d.ratio_infected*d.graph.number_of_nodes()
+        logger.info(str)
+        print str
+        s_time = clock()
+        experiment.detection_test(d)
+        e_time = clock()
+        print "Running time:", e_time-s_time
+        logger.info(("Running time:", e_time-s_time))
+        experiment.print_result(test)
+        d.ratio_infected += 0.002
+        print '\n'
+        logger.info('\n')
+
+    end_time = clock()
+    print "Running time:", end_time-start_time

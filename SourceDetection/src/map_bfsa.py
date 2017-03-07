@@ -1,30 +1,16 @@
+# coding=utf-8
 """
 A part of Source Detection.
 Author: Biao Chang, changb110@gmail.com, from University of Science and Technology of China
-created at 2017/2/27.
+created at 2017/1/9.
 """
-
-# coding=utf-8
 
 import networkx as nx
 import numpy as np
 from decimal import *
 import method
 import itertools
-import multiprocessing
-
-import copy_reg
-import types
-from functools import partial
-
-def _pickle_method(m):
-    if m.im_self is None:
-        return getattr, (m.im_class, m.im_func.func_name)
-    else:
-        return getattr, (m.im_self, m.im_func.func_name)
-
-copy_reg.pickle(types.MethodType, _pickle_method)
-
+import pytrie
 
 class BFSA(method.Method):
     """detect the source with Greedy Search Bound Approximation.
@@ -40,9 +26,9 @@ class BFSA(method.Method):
         self.prior_detector = prior_detector
         self.bfs_trees = {}
         self.likelihoods = {}
-        self.permutation_likelihood = {}
         self.depths = {}
         self.descendants = {}
+        self.permutation_likelihood = {}  # key->value(prefix_likelihood, neighbours, w)
 
     def detect(self):
         """detect the source with GSBA.
@@ -59,34 +45,23 @@ class BFSA(method.Method):
         self.reset_centrality()
         nodes = self.subgraph.nodes()
         self.weights = self.data.weights
-        self.node2index = self.data.node2index
-        n = len(nodes)
         for v in nodes:
             self.bfs_trees[v] = nx.bfs_tree(self.subgraph, v)
-            self.likelihoods[v] = multiprocessing.Value('d', 0.0)
-            self.permutation_likelihood[v] = list()
-            #self.values[v] = multiprocessing.Value('d', 0.0)
+            self.likelihoods[v] = 0
             self.descendants[v] = {}
             self.depths[v] = {}
             self.visited.clear()
             self.find_descendants_bfs(v, v)
-
-        multiprocessing.freeze_support()
-        processes = list()
-        for i in np.arange(0, n):
-            nodes[0], nodes[i] = nodes[i], nodes[0]
-            p = multiprocessing.Process(target=self.get_likelihood_by_BFSA, args=(nodes, 1, n - 1))
-            p.start()
-            processes.append(p)
-        for p in processes:
-            p.join()
-
-        #self.get_likelihood_by_BFSA2(nodes)
+        # for i in np.arange(1, len(nodes)):
+        #     nodes[0], nodes[i] = nodes[i], nodes[0]
+            # self.get_likelihood_by_BFSA(nodes, 1, len(nodes) - 1)
+        self.get_likelihood_by_BFSA2(nodes)
         #self.get_likelihood_by_BFSA(nodes, 0, len(nodes) - 1)
-
-        posterior = {v: self.prior[v] * Decimal(self.likelihoods[v].value) for v in nodes}
-
+        posterior = {v: self.prior[v] * Decimal(self.likelihoods[v]) for v in nodes}
         nx.set_node_attributes(self.subgraph, 'centrality', posterior)
+        self.permutation_likelihood.clear()
+        self.bfs_trees.clear()
+        self.descendants.clear()
         return self.sort_nodes_by_centrality()
 
     def find_descendants_bfs(self, root, u,depth=0):
@@ -120,13 +95,16 @@ class BFSA(method.Method):
             if permitted:
                 self.likelihoods[p[0]] += self.compute_likelihood(p)
 
-    def get_likelihood_by_BFSA(self,  nodes, p, q ):
+
+    def get_likelihood_by_BFSA(self, nodes, p, q):
         """extends Heap's permutation generating algorithm.
         Permitted permutation: each node has a certain depth at which it will be found.
+
         Args:
             nodes: a list of all nodes
             p: the starting index
             q: the end index
+
         Returns:
         """
         if p == q:
@@ -139,12 +117,8 @@ class BFSA(method.Method):
                 # for j in np.arange(1, i):
                 #     if nodes[j] in self.descendants[nodes[0]][nodes[i]]:
                 #         return
-            l = self.compute_likelihood(nodes)
-            self.likelihoods[nodes[0]].value += l
-            # self.permutation_likelihood[nodes[0]].append(l)
-            # self.values[nodes[0]].value = self.values[nodes[0]].value+l
-            # print nodes, l, self.likelihoods[nodes[0]]
-            return l
+
+            self.likelihoods[nodes[0]] += self.compute_likelihood(nodes)
         else:
             for i in np.arange(p, q + 1):
                 nodes[p], nodes[i] = nodes[i], nodes[p]
@@ -160,25 +134,77 @@ class BFSA(method.Method):
         likelihood = 1
         neighbours = set()
         neighbours.add(nodes[0])
-        w = {} # effective propagation probabilities: node->w
+        w = {}  # effective propagation probabilities: node->w
         w[nodes[0]] = 1
         visited = set()
+
         for i in np.arange(0, len(nodes)):
             u = nodes[i]
-            visited.add(u)
             w_sum = sum([w[j] for j in neighbours])
-            likelihood *= w[u]/w_sum
+            likelihood *= w[u] / w_sum
             neighbours.remove(u)
             new = nx.neighbors(self.data.graph, u)
+            visited.add(u)
 
             for h in new:
                 if h in visited:
                     continue
                 # compute w for h
-                w_h2u = self.weights[self.node2index[u]][self.node2index[h]]
+                w_h2u = self.weights[self.data.node2index[u]][self.data.node2index[h]]
                 if w.has_key(h):
                     w[h] = 1 - (1 - w[h]) * (1 - w_h2u)
                 else:
                     w[h] = w_h2u
                 neighbours.add(h)
+        return likelihood
+
+    def compute_likelihood_buffered(self, nodes):
+        """get P(G|v) by Equation (11);
+        Args:
+            nodes: a permitted permutation
+        Returns:
+        """
+        likelihood = 1
+        neighbours = set()
+        w = {} # effective propagation probabilities: node->w
+
+        "load likelihood, neighbours, w from buffers"
+        start_index = -1
+        for i in range(len(nodes), 0, -1):
+            if self.permutation_likelihood.has_key(nodes[0:i]):
+                start_index = i
+                # prefix = self.permutation_likelihood[nodes[0:i]]
+                likelihood, neighbours, w = self.permutation_likelihood[nodes[0:i]]
+                neighbours = neighbours.copy()
+                w = w.copy()
+                break
+        if start_index is -1:
+            neighbours.add(nodes[0])
+            w[nodes[0]] = 1
+            start_index = 0
+
+        visited = set()
+        visited.update(nodes[0:start_index])
+
+        for i in np.arange(start_index, len(nodes)):
+            u = nodes[i]
+            w_sum = sum([w[j] for j in neighbours])
+            likelihood *= w[u]/w_sum
+            neighbours.remove(u)
+            new = nx.neighbors(self.data.graph, u)
+            visited.add(u)
+
+            for h in new:
+                if h in visited:
+                    continue
+                # compute w for h
+                w_h2u = self.weights[self.data.node2index[u]][self.data.node2index[h]]
+                if w.has_key(h):
+                    w[h] = 1 - (1 - w[h]) * (1 - w_h2u)
+                else:
+                    w[h] = w_h2u
+                neighbours.add(h)
+            if i<6:
+                "add to buffers"
+                self.permutation_likelihood[nodes[0:(i+1)]] = likelihood, neighbours.copy(), w.copy()
         return likelihood

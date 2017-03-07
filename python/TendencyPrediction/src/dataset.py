@@ -125,7 +125,7 @@ class Dataset:
         return w
 
     def divideDataSet(self, count, labeled, m):
-        """generate the training and test set"""
+        """generate the training and test_category set"""
         training = []
         c = len(count)
         index = []
