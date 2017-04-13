@@ -7,9 +7,9 @@ created at 2017/1/9.
 
 import pickle
 import random
-
+import matplotlib.pyplot as plt
 import networkx as nx
-
+import numpy as np
 
 class Graph:
     graph = nx.Graph()
@@ -47,7 +47,8 @@ class Graph:
             elif path.endswith('.txt'):
                 self.graph = nx.read_weighted_edgelist(path, comments=comments)
         self.subgraph = self.graph
-        self.weights = nx.adjacency_matrix(self.graph, weight='weight').todense().tolist()
+        self.weights = nx.adjacency_matrix(self.graph, weight='weight')
+        # self.weights = nx.adjacency_matrix(self.graph, weight='weight').todense().tolist() # read elements faster
         i = 0
         for v in self.graph.nodes():
             self.node2index[v] = i
@@ -77,19 +78,23 @@ class Graph:
         infected = set()
         activated_current = set()
         activated_next = set()
+        visited = set()
         infected.add(source)
         activated_current.add(source)
+        visited.add(source)
         stop = False
+
         if scheme == 'random':
-            while stop == False and len(activated_current)>0:
+            while stop is False and len(activated_current)>0:
                 infected = infected.union(activated_current)
                 for w in activated_current:
                     if stop:
                         break
                     neighbors = nx.all_neighbors(self.graph, w)
                     for u in neighbors:
-                        if u not in infected:
-                            weight = self.weights[self.node2index[w]][self.node2index[u]]
+                        if u not in visited:
+                            weight = self.weights[self.node2index[w],self.node2index[u]]
+                            # weight = self.weights[self.node2index[w]][self.node2index[u]]
                             if random.random() <= weight:
                                 """u is infected successfully"""
                                 infected.add(u)
@@ -97,6 +102,7 @@ class Graph:
                                 if len(infected)>=max_infected_number or (len(infected)>= self.graph.number_of_nodes()):
                                     stop = True
                                     break
+                        visited.add(u)
                 activated_current = activated_next.copy()
                 activated_next.clear()
 
@@ -134,7 +140,8 @@ class Graph:
                     neighbors = nx.all_neighbors(self.graph, w)
                     for u in neighbors:
                         if u not in infected:
-                            weight = self.weights[self.node2index[w]][self.node2index[u]]
+                            weight = self.weights[self.node2index[w],self.node2index[u]]
+                            # weight = self.weights[self.node2index[w]][self.node2index[u]]
                             if random.random() <= weight:
                                 """u is infected successfully"""
                                 infected.add(u)
@@ -164,17 +171,20 @@ class Graph:
         # file = "../data/karate_club.gml"
         # g = nx.karate_club_graph()
 
-        g = nx.connected_watts_strogatz_graph(size, 5, 0.3)
-        file = "../data/small-world.ws.v%s.e%s.gml" % (g.number_of_nodes(), g.number_of_edges())
+        # g = nx.connected_watts_strogatz_graph(size, 5, 0.3)
+        # file = "../data/small-world.ws.v%s.e%s.gml" % (g.number_of_nodes(), g.number_of_edges())
+        #
+        # g = nx.barabasi_albert_graph(500, 2)
+        # file = "../data/scale-free.ba.v%s.e%s.gml" % (g.number_of_nodes(), g.number_of_edges())
+        #
+        g = nx.read_edgelist("../data/power-grid.txt", comments='#')
+        file = "../data/power-grid.gml"
+        #
+        # g = nx.read_edgelist("../data/Wiki-Vote.txt", comments='#')
+        # file = "../data/Wiki-Vote.gml"
 
-        g = nx.barabasi_albert_graph(500, 2)
-        file = "../data/scale-free.ba.v%s.e%s.gml" % (g.number_of_nodes(), g.number_of_edges())
-
-        # g = nx.read_edgelist("../data/power.gml", comments='#')
-        # file = "../data/power-grid.gml"
-
-        g = nx.read_edgelist("../data/Wiki-Vote.txt", comments='#')
-        file = "../data/Wiki-Vote.gml"
+        # g = nx.read_edgelist("../data/CA-AstroPh.txt", comments='#')
+        # file = "../data/CA-AstroPh.gml"
 
         g = max(nx.connected_component_subgraphs(g), key=len)
 
@@ -199,3 +209,14 @@ class Graph:
             pickle.dump(self, writer)
             writer.close()
             i += 1
+
+    def get_diameter_for_subgraphs(self, infected_size, scheme='random'):
+        diameter = 0.0
+        ratio_edge2node = 0.0
+        for v in self.graph.nodes():
+            self.infect_from_source_SI(v, scheme=scheme, infected_size=infected_size)
+            diameter += nx.diameter(self.subgraph)
+            ratio_edge2node += self.subgraph.number_of_edges()*1.0/self.subgraph.number_of_nodes()
+        # nx.draw_circular(self.subgraph)
+        # plt.show()
+        return diameter/self.graph.number_of_nodes(), ratio_edge2node/self.graph.number_of_nodes()

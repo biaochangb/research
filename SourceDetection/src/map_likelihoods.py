@@ -12,8 +12,9 @@ import method
 import itertools
 import pytrie
 
-class BFSA(method.Method):
-    """detect the source with Greedy Search Bound Approximation.
+
+class Likelihoods(method.Method):
+    """detect the source with lower and upper Bound Approximation.
         Please refer to the my paper for more details.
     """
     prior = ''
@@ -26,12 +27,13 @@ class BFSA(method.Method):
         self.prior_detector = prior_detector
         self.bfs_trees = {}
         self.likelihoods = {}
+        self.likelihoods_lists = {}
         self.depths = {}
         self.descendants = {}
         self.permutation_likelihood = {}  # key->value(prefix_likelihood, neighbours, w)
 
     def detect(self):
-        """detect the source with GSBA.
+        """detect the source with Likelihoods.
 
         Returns:
             @rtype:int
@@ -45,9 +47,18 @@ class BFSA(method.Method):
         self.reset_centrality()
         nodes = self.subgraph.nodes()
         self.weights = self.data.weights
+
+        abc = set()
+        for v in nodes:
+            neihbors = nx.neighbors(self.data.graph, v)
+            abc.update(neihbors)
+        g = self.data.graph.subgraph(abc)
+        print g.nodes(), g.edges(),nx.get_edge_attributes(g, 'weight')
+
         for v in nodes:
             self.bfs_trees[v] = nx.bfs_tree(self.subgraph, v)
             self.likelihoods[v] = 0
+            self.likelihoods_lists[v] = list()
             self.descendants[v] = {}
             self.depths[v] = {}
             self.visited.clear()
@@ -59,6 +70,7 @@ class BFSA(method.Method):
         #self.get_likelihood_by_BFSA(nodes, 0, len(nodes) - 1)
         posterior = {v: Decimal(self.prior[v]) * Decimal(self.likelihoods[v]) for v in nodes}
         nx.set_node_attributes(self.subgraph, 'centrality', posterior)
+        print "=========", self.likelihoods_lists
         self.permutation_likelihood.clear()
         self.bfs_trees.clear()
         self.descendants.clear()
@@ -93,7 +105,9 @@ class BFSA(method.Method):
                 #         permitted = False
                 #         break
             if permitted:
-                self.likelihoods[p[0]] += self.compute_likelihood(p)
+                l = self.compute_likelihood(p)
+                self.likelihoods[p[0]] += l
+                self.likelihoods_lists[p[0]].append(l)
 
 
     def get_likelihood_by_BFSA(self, nodes, p, q):

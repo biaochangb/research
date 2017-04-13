@@ -105,7 +105,7 @@ class Experiment:
                 infected = data.infect_from_source_IC(s, infected_size=infected_size)
             elif self.propagation_model is 'SI':
                 infected = data.infect_from_source_SI(s, infected_size=infected_size)
-            if infected.__len__() <= 1:
+            if infected_size is not None and len(infected)<infected_size-1:
                 continue
             for m in self.methods:
                 m.set_data(data)

@@ -25,9 +25,6 @@ import map_bfsa_parallel as bfsa_p
 import prior
 import numpy as np
 from experiment import Experiment
-import map_ulbaa as ulbaa
-import map_gslba as gslba
-import map_gsba2 as gsba2
 
 if __name__ == '__main__':
 
@@ -37,30 +34,30 @@ if __name__ == '__main__':
     prior_detector3 = dc.DistanceCenter()
     prior_detector4 = jc.JordanCenter()
     prior_detector5 = ri.ReverseInfection()
-    methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(),ri.ReverseInfection(), di.DynamicImportance(),
-               gsba.GSBA(prior_detector1), gsba.GSBA(prior_detector3),gsba.GSBA(prior_detector4),]
-    # methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(),
-    #            gsba.GSBA(prior_detector1), gsba.GSBA(prior_detector3),gsba.GSBA(prior_detector4),
-    #            ulbaa.ULBAA(prior_detector1), ulbaa.ULBAA(prior_detector3), ulbaa.ULBAA(prior_detector4),
-    #            gslba.GSLBA(prior_detector1), gslba.GSLBA(prior_detector3), gslba.GSLBA(prior_detector4),
-    #            gsba2.GSBA(prior_detector1), gsba2.GSBA( prior_detector3),gsba2.GSBA(prior_detector4),]
+    methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(),ri.ReverseInfection(),prior_detector2,
+               gsba.GSBA( prior_detector1),gsba.GSBA(prior_detector2), gsba.GSBA( prior_detector3),
+               gsba.GSBA(prior_detector4), gsba.GSBA( prior_detector5)]
+    methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(), ri.ReverseInfection(), di.DynamicImportance(),
+               gsba.GSBA(prior_detector1),gsba.GSBA(prior_detector3),gsba.GSBA(prior_detector4)]
 
-    logger = log.Logger(logname='../data/main_wiki_vote.log', loglevel=logging.INFO, logger="experiment").get_log()
+    logger = log.Logger(logname='../data/main_IC.log', loglevel=logging.INFO, logger="experiment").get_log()
     experiment = Experiment(methods, logger)
-    experiment.propagation_model = 'SI'
+    experiment.propagation_model = 'IC'
 
     start_time = clock()
     print "Starting..."
-    d = data.Graph("../data/test.txt", weighted=1)
+    # d = data.Graph("../data/scale-free.ba.v500.e996.gml", weighted=1)
+    # d = data.Graph("../data/power-grid.gml", weighted=1)
     d = data.Graph("../data/Wiki-Vote.gml", weighted=1)
     d.debug = False
     test_num = 100
 
     print 'Graph size: ', d.graph.number_of_nodes(), d.graph.number_of_edges()
-    # test_category = experiment.RANDOM_TEST
-    # experiment.start(d, test_category, test_num, 10, 46, 5)
+    test_category = experiment.RANDOM_TEST
+    experiment.start(d, test_category, test_num, 10, 46, 5)
+
     test_category = experiment.FULL_TEST
-    experiment.start(d, test_category, test_num, 10, 31, 5)
+    # experiment.start(d, test_category, test_num, 10, 46, 5)
 
     end_time = clock()
     print "Running time:", end_time-start_time

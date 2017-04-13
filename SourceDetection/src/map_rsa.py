@@ -15,8 +15,8 @@ import math
 from blist import blist
 
 
-class GSBA(method.Method):
-    """detect the source with Greedy Search Bound Approximation.
+class RSA(method.Method):
+    """detect the source with Random Selection Approximation.
         Please refer to the my paper for more details.
     """
     prior = ''
@@ -28,7 +28,7 @@ class GSBA(method.Method):
         self.prior_detector = prior_detector
 
     def detect(self):
-        """detect the source with GSBA.
+        """detect the source with RSA.
 
         Returns:
             @rtype:int
@@ -60,7 +60,7 @@ class GSBA(method.Method):
             neighbours.add(v)
             likelihood = 1
             w = {}  # effective propagation probabilities: node->w
-            w_key_sorted = blist()
+            w_key_sorted = list()
             w[v] = 1
             w_key_sorted.append(v)
             while len(included) < n:
@@ -90,12 +90,7 @@ class GSBA(method.Method):
                     if h in infected_nodes:
                         if h in w_key_sorted:
                             w_key_sorted.remove(h)  # remove the old w[h]
-                        k = 0
-                        while k < len(w_key_sorted):
-                            if w[w_key_sorted[k]] > w[h]:
-                                break
-                            k += 1
-                        w_key_sorted.insert(k,h)
+                        w_key_sorted.append(h)
                         #w_key_sorted[k:k] = [h]
             posterior[v] = (decimal.Decimal(self.prior[v])* decimal.Decimal(likelihood) * rumor_centralities[v])
         nx.set_node_attributes(self.subgraph, 'centrality', posterior)

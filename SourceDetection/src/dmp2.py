@@ -31,7 +31,7 @@ class DynamicMessagePassing(method.Method):
         n = self.data.graph.number_of_nodes()
         n_i = self.subgraph.number_of_nodes()
         a = nx.adjacency_matrix(self.data.graph, weight=None).todense()  # adjacent matrix
-        weights = np.asarray(self.data.weights) # infection probability
+        weights = np.asarray(nx.adjacency_matrix(self.data.graph, weight='weight').todense()) # infection probability
         mu = np.zeros(n)  # recover probability
         diameter = 1* nx.diameter(self.subgraph)
         likelihoods = {}  # the likelihood, P(o|i), in Eq. 21.

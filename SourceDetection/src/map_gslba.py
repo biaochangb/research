@@ -15,8 +15,8 @@ import math
 from blist import blist
 
 
-class GSBA(method.Method):
-    """detect the source with Greedy Search Bound Approximation.
+class GSLBA(method.Method):
+    """detect the source with Greedy Search Lower Bound Approximation.
         Please refer to the my paper for more details.
     """
     prior = ''
@@ -28,7 +28,7 @@ class GSBA(method.Method):
         self.prior_detector = prior_detector
 
     def detect(self):
-        """detect the source with GSBA.
+        """detect the source with GSLvb BA.
 
         Returns:
             @rtype:int
@@ -53,7 +53,7 @@ class GSBA(method.Method):
         neighbours = set()
         weights = self.data.weights
         for v in infected_nodes:
-            """find the approximate upper bound by greedy searching"""
+            """find the approximate lower bound by greedy searching"""
             included.clear()
             neighbours.clear()
             included.add(v)
@@ -75,8 +75,7 @@ class GSBA(method.Method):
                         continue
                     neighbours.add(h)
                     # compute w for h
-                    w_h2u = weights[self.data.node2index[u],self.data.node2index[h]]
-                    # w_h2u = weights[self.data.node2index[u]][self.data.node2index[h]]
+                    w_h2u = weights[self.data.node2index[u]][self.data.node2index[h]]
                     if h in w.keys():
                         w[h] = 1-(1-w[h])*(1-w_h2u)
                     else:
@@ -86,13 +85,13 @@ class GSBA(method.Method):
                     # for be in included.intersection(h_neighbor):
                     #     w_h *= 1 - self.data.get_weight(h, be)
                     # w[h] = 1 - w_h
-                    """insert h into w_key_sorted, ranking by w from small to large"""
+                    """insert h into w_key_sorted, ranking by w from large to small"""
                     if h in infected_nodes:
                         if h in w_key_sorted:
                             w_key_sorted.remove(h)  # remove the old w[h]
                         k = 0
                         while k < len(w_key_sorted):
-                            if w[w_key_sorted[k]] > w[h]:
+                            if w[w_key_sorted[k]] < w[h]:
                                 break
                             k += 1
                         w_key_sorted.insert(k,h)

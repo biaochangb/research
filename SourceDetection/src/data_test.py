@@ -14,14 +14,16 @@ if __name__ == '__main__':
     output_file = "../data/simulation/small-world.ws.v100.e500.gml"
 
     ratio_infected = 0.03
-    input_file = "../data/power-grid.gml"
+    input_file = "../data/power-grid.txt"
     output_file = "../data/simulation/power-grid.gml"
 
     ratio_infected = 0.03
-    input_file = "../data/Wiki-Vote.txt"
+    # input_file = "../data/Wiki-Vote.gml"
     output_file = "../data/simulation/Wiki-Vote.gml"
 
     d = data.Graph(input_file, weighted=1)
     d.generate_random_graph(200)
 
     #d.generate_infected_subgraph(output_file, ratio_infected)
+
+    # print d.get_diameter_for_subgraphs(35)

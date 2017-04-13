@@ -83,7 +83,7 @@ class BFSA(method.Method):
         #self.get_likelihood_by_BFSA2(nodes)
         #self.get_likelihood_by_BFSA(nodes, 0, len(nodes) - 1)
 
-        posterior = {v: self.prior[v] * Decimal(self.likelihoods[v].value) for v in nodes}
+        posterior = {v: Decimal(self.prior[v]) * Decimal(self.likelihoods[v].value) for v in nodes}
 
         nx.set_node_attributes(self.subgraph, 'centrality', posterior)
         return self.sort_nodes_by_centrality()

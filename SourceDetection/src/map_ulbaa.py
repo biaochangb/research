@@ -15,8 +15,8 @@ import math
 from blist import blist
 
 
-class GSBA(method.Method):
-    """detect the source with Greedy Search Bound Approximation.
+class ULBAA(method.Method):
+    """detect the source with lower and upper Bound Approximation.
         Please refer to the my paper for more details.
     """
     prior = ''
@@ -58,7 +58,7 @@ class GSBA(method.Method):
             neighbours.clear()
             included.add(v)
             neighbours.add(v)
-            likelihood = 1
+            likelihood_upper = 1
             w = {}  # effective propagation probabilities: node->w
             w_key_sorted = blist()
             w[v] = 1
@@ -66,7 +66,7 @@ class GSBA(method.Method):
             while len(included) < n:
                 w_sum = sum([w[j] for j in neighbours])
                 u = w_key_sorted.pop()  # pop out the last element from w_key_sorted with the largest w
-                likelihood *= w[u] / w_sum
+                likelihood_upper *= w[u] / w_sum
                 included.add(u)
                 neighbours.remove(u)
                 new = nx.neighbors(self.data.graph, u)
@@ -76,7 +76,6 @@ class GSBA(method.Method):
                     neighbours.add(h)
                     # compute w for h
                     w_h2u = weights[self.data.node2index[u],self.data.node2index[h]]
-                    # w_h2u = weights[self.data.node2index[u]][self.data.node2index[h]]
                     if h in w.keys():
                         w[h] = 1-(1-w[h])*(1-w_h2u)
                     else:
@@ -97,6 +96,46 @@ class GSBA(method.Method):
                             k += 1
                         w_key_sorted.insert(k,h)
                         #w_key_sorted[k:k] = [h]
-            posterior[v] = (decimal.Decimal(self.prior[v])* decimal.Decimal(likelihood) * rumor_centralities[v])
+
+            """find the approximate lower bound by greedy searching"""
+            included.clear()
+            neighbours.clear()
+            included.add(v)
+            neighbours.add(v)
+            likelihood_lower = 1
+            w = {}  # effective propagation probabilities: node->w
+            w_key_sorted = blist()
+            w[v] = 1
+            w_key_sorted.append(v)
+            while len(included) < n:
+                w_sum = sum([w[j] for j in neighbours])
+                u = w_key_sorted.pop()  # pop out the last element from w_key_sorted with the largest w
+                likelihood_lower *= w[u] / w_sum
+                included.add(u)
+                neighbours.remove(u)
+                new = nx.neighbors(self.data.graph, u)
+                for h in new:
+                    if h in included:
+                        continue
+                    neighbours.add(h)
+                    # compute w for h
+                    w_h2u = weights[self.data.node2index[u], self.data.node2index[h]]
+                    if h in w.keys():
+                        w[h] = 1 - (1 - w[h]) * (1 - w_h2u)
+                    else:
+                        w[h] = w_h2u
+                    """insert h into w_key_sorted, ranking by w from large to small"""
+                    if h in infected_nodes:
+                        if h in w_key_sorted:
+                            w_key_sorted.remove(h)  # remove the old w[h]
+                        k = 0
+                        while k < len(w_key_sorted):
+                            if w[w_key_sorted[k]] < w[h]:
+                                break
+                            k += 1
+                        w_key_sorted.insert(k, h)
+                        # w_key_sorted[k:k] = [h]
+            likelihood = decimal.Decimal(likelihood_lower + likelihood_upper)*rumor_centralities[v]/2
+            posterior[v] = decimal.Decimal(self.prior[v])* likelihood
         nx.set_node_attributes(self.subgraph, 'centrality', posterior)
         return self.sort_nodes_by_centrality()

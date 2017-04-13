@@ -60,12 +60,12 @@ class GSBA(method.Method):
             neighbours.add(v)
             likelihood = 1
             w = {}  # effective propagation probabilities: node->w
-            w_key_sorted = blist()
             w[v] = 1
-            w_key_sorted.append(v)
+            w_sum = 1
+            ratio_max_node = v
             while len(included) < n:
-                w_sum = sum([w[j] for j in neighbours])
-                u = w_key_sorted.pop()  # pop out the last element from w_key_sorted with the largest w
+                # w_sum = sum([w[j] for j in neighbours])
+                u = ratio_max_node
                 likelihood *= w[u] / w_sum
                 included.add(u)
                 neighbours.remove(u)
@@ -75,28 +75,33 @@ class GSBA(method.Method):
                         continue
                     neighbours.add(h)
                     # compute w for h
-                    w_h2u = weights[self.data.node2index[u],self.data.node2index[h]]
-                    # w_h2u = weights[self.data.node2index[u]][self.data.node2index[h]]
+                    w_h2u = weights[self.data.node2index[u]][self.data.node2index[h]]
                     if h in w.keys():
                         w[h] = 1-(1-w[h])*(1-w_h2u)
                     else:
                         w[h] = w_h2u
-                    # h_neighbor = nx.neighbors(self.data.graph, h)
-                    # w_h = 1
-                    # for be in included.intersection(h_neighbor):
-                    #     w_h *= 1 - self.data.get_weight(h, be)
-                    # w[h] = 1 - w_h
-                    """insert h into w_key_sorted, ranking by w from small to large"""
-                    if h in infected_nodes:
-                        if h in w_key_sorted:
-                            w_key_sorted.remove(h)  # remove the old w[h]
-                        k = 0
-                        while k < len(w_key_sorted):
-                            if w[w_key_sorted[k]] > w[h]:
-                                break
-                            k += 1
-                        w_key_sorted.insert(k,h)
-                        #w_key_sorted[k:k] = [h]
+
+                w_sum = sum([w[j] for j in neighbours])
+                ratio_max = 0.0
+
+                """select the next node to maximize the ratio of w/sum"""
+                for h in neighbours:
+                    r = w_sum-w[h]
+                    h_neighbors = nx.neighbors(self.data.graph, h)
+                    for k in h_neighbors:
+                        if k in included:
+                            continue
+                        w_h2k = weights[self.data.node2index[h]][self.data.node2index[k]]
+                        if k in neighbours:
+                            r = r-w[k]+ 1-(1-w[h])*(1-w_h2k) # update previous w[k]
+                        else:
+                            r += w_h2k
+                    r = w[h]/r
+                    if r>ratio_max:
+                        ratio_max = r
+                        ratio_max_node = h
+
+
             posterior[v] = (decimal.Decimal(self.prior[v])* decimal.Decimal(likelihood) * rumor_centralities[v])
         nx.set_node_attributes(self.subgraph, 'centrality', posterior)
         return self.sort_nodes_by_centrality()
