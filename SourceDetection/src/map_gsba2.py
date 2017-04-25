@@ -75,7 +75,7 @@ class GSBA(method.Method):
                         continue
                     neighbours.add(h)
                     # compute w for h
-                    w_h2u = weights[self.data.node2index[u]][self.data.node2index[h]]
+                    w_h2u = weights[self.data.node2index[u],self.data.node2index[h]]
                     if h in w.keys():
                         w[h] = 1-(1-w[h])*(1-w_h2u)
                     else:
@@ -100,6 +100,7 @@ class GSBA(method.Method):
                     if r>ratio_max:
                         ratio_max = r
                         ratio_max_node = h
+
 
 
             posterior[v] = (decimal.Decimal(self.prior[v])* decimal.Decimal(likelihood) * rumor_centralities[v])

@@ -26,6 +26,7 @@ import prior
 import map_ulbaa as ulbaa
 import map_gslba as gslba
 import map_gsba2 as gsba2
+import map_gsba3 as gsba3
 import map_rsa as rsa
 
 import numpy as np
@@ -39,15 +40,11 @@ if __name__ == '__main__':
     prior_detector3 = dc.DistanceCenter()
     prior_detector4 = jc.JordanCenter()
     prior_detector5 = ri.ReverseInfection()
-    methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(), ri.ReverseInfection(), di.DynamicImportance(), prior_detector2,
-               gsba.GSBA(prior_detector0), gsba.GSBA(prior_detector1), gsba.GSBA( prior_detector3),
-               gsba.GSBA(prior_detector4), gsba.GSBA( prior_detector5), gsba.GSBA(prior_detector2), bfsa_p.BFSA(prior_detector4)]
-    methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(), ri.ReverseInfection(), di.DynamicImportance(),
-               gsba.GSBA(prior_detector0), gsba.GSBA(prior_detector1), gsba.GSBA( prior_detector3),
-               gsba.GSBA(prior_detector4),
-               rsa.RSA(prior_detector1),rsa.RSA(prior_detector3),rsa.RSA(prior_detector4),]
+    methods = [gsba.GSBA(prior_detector0), gsba.GSBA(prior_detector1), gsba.GSBA( prior_detector3),
+               gsba.GSBA(prior_detector4), gsba3.GSBA(prior_detector0), gsba3.GSBA(prior_detector1), gsba3.GSBA( prior_detector3),
+               gsba3.GSBA(prior_detector4)]
 
-    logger = log.Logger(logname='../data/main_scale_free.log', loglevel=logging.INFO, logger="experiment").get_log()
+    logger = log.Logger(logname='../data/main_scale_free3.log', loglevel=logging.INFO, logger="experiment").get_log()
     experiment = Experiment(methods, logger)
     experiment.propagation_model = 'SI'
 

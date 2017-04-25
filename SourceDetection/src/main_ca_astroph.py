@@ -40,8 +40,7 @@ if __name__ == '__main__':
                gsba.GSBA( prior_detector1),gsba.GSBA(prior_detector2), gsba.GSBA( prior_detector3),
                gsba.GSBA(prior_detector4), gsba.GSBA( prior_detector5)]
     methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(), ri.ReverseInfection(), di.DynamicImportance(),
-               gsba.GSBA(prior_detector1),gsba.GSBA(prior_detector3),gsba.GSBA(prior_detector4),
-               ulbaa.ULBAA(prior_detector1), ulbaa.ULBAA(prior_detector3), ulbaa.ULBAA(prior_detector4) ]
+               gsba.GSBA(prior_detector1),gsba.GSBA(prior_detector3),gsba.GSBA(prior_detector4),]
     #methods = [dc.DistanceCenter()]
     #methods = [bfsa_p.BFSA(prior_detector1)]
     # methods = [dmp2.DynamicMessagePassing()]
@@ -58,11 +57,9 @@ if __name__ == '__main__':
 
     print 'Graph size: ', d.graph.number_of_nodes(), d.graph.number_of_edges()
     test_category = experiment.RANDOM_TEST
-    experiment.start(d, test_category, test_num, 10, 41, 5)
+    experiment.start(d, test_category, test_num, 10, 46, 5)
     test_category = experiment.RANDOM_TEST
-    experiment.start(d, test_category, 2000, 10, 41, 5)
-    test_category = experiment.FULL_TEST
-    experiment.start(d, test_category, test_num, 10, 41, 5)
+    experiment.start(d, test_category, 2000, 10, 46, 5)
 
     end_time = clock()
     print "Running time:", end_time-start_time

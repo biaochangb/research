@@ -13,8 +13,8 @@ import networkx as nx
 class Fig:
     """drawing figs according to the experiment results."""
     colors = {'RC': '#00008f', 'DC': '#0070ff', 'JC': '#00dfff', 'RI': '#bfff40', 'DI': '#ffcf00',
-              'DMP': '#ff6000', 'GSBA-JC': '#ef0000', 'BFSA-JC': '#800000', 'GSBA-U': '#696969', 'GSBA-RC': '#bfff40',
-              'GSBA-DC': '#ffcf00', 'GSBA-RI': '#bfff40', 'GSBA-DMP': '#ff6000'}
+              'DMP': '#ff6000', 'GSBA-JC': '#ef0000', 'BFSA-JC': '#800000', 'GSBA-U': '#696969', 'GSBA-RC': '#9aad74',
+              'GSBA-DC': '#31591F', 'GSBA-RI': '#bfff40', 'GSBA-DMP': '#ff6000'}
     markers = {'RC': '.', 'DC': '*', 'JC': 'o', 'RI': 'p', 'DI': '+',
                'DMP': 'x', 'GSBA-JC': 's', 'BFSA-RC': '^', 'GSBA-U': '>', 'GSBA-RC': '.', 'GSBA-DC': '*',
                'GSBA-RI': 'p', 'GSBA-DMP': 'x'}
@@ -33,69 +33,75 @@ class Fig:
             else:
                 ax.bar(index + i * width * 2 / n + 0.1, y[i], width * 2 / n, label=legend[i],
                        color=self.colors[legend[i]])
-        plt.xlabel(xlabel, fontsize=30)
-        plt.ylabel(ylabel, fontsize=30)
+        plt.xlabel(xlabel, fontsize=38)
+        plt.ylabel(ylabel, fontsize=38)
         # plt.title('Scores by group and Category')
 
-        plt.xticks(index + width + 0.1, x, fontsize=28)
-        plt.yticks(fontsize=28)  # change the num axis size
+        plt.xticks(index + width + 0.1, x, fontsize=38)
+        plt.yticks(fontsize=38)  # change the num axis size
         # plt.xlim(0, 50)  # The ceil
         y_min = np.min(y)
         y_max = np.max(y)
-        plt.ylim(0.8 * y_min, 1.25 * y_max)  # The ceil
+        plt.ylim(0.8 * y_min, 1.28 * y_max)  # The ceil
         plt.legend(loc=1, ncol=n / 2, mode="expand", borderaxespad=0., fontsize=26)
         plt.tight_layout()
         if path is not None:
             fig.savefig(path)
         if self.debug:
             plt.show()
+        plt.close()
 
     def lines(self, x, y, legend, xlabel, ylabel, title='', path=None):
         n = len(legend)
-        width = 3
-        fig, ax = plt.subplots(figsize=(16, 8))
+        width = 5
+        fig, ax = plt.subplots(figsize=(11, 8))
         for i in np.arange(0, n):
-            print y[i]
             ax.plot(x, y[i], '-D', label=legend[i], color=self.colors[legend[i]], linewidth=width,
-                    markersize=10, marker=self.markers[legend[i]], markeredgewidth=2)
-        plt.xlabel(xlabel, fontsize=26)
-        plt.ylabel(ylabel, fontsize=26)
+                    markersize=22, marker=self.markers[legend[i]], markeredgewidth=2)
+        plt.xlabel(xlabel, fontsize=38)
+        plt.ylabel(ylabel, fontsize=38)
         # plt.title('Scores by group and Category')
 
-        plt.xticks(fontsize=24)
-        plt.yticks(fontsize=24)  # change the num axis size
+        plt.xticks(fontsize=38)
+        plt.yticks(fontsize=38)  # change the num axis size
         # plt.xlim(0, 50)  # The ceil
         y_min = np.min(y)
         y_max = np.max(y)
         x_max = np.max(x)
         x_min = np.min(x)
-        plt.xlim(x_min - 0.2, x_max + 0.2)
-        plt.ylim(y_min - 0.2, 1.1 * y_max)  # The ceil
-        plt.legend(loc=1, ncol=n, mode="expand", borderaxespad=0., fontsize=24)
+        plt.xlim(x_min*0.99, x_max*1.01)
+        if y_min<0.1:
+            plt.ylim(y_min-0.04, 1.3 * y_max)  # The ceil
+        else:
+            plt.ylim(y_min*0.9, 1.3 * y_max)  # The ceil
+        plt.legend(loc=1, ncol=n / 2, mode="expand", borderaxespad=0., fontsize=28)
         plt.tight_layout()
+        if self.debug:
+            plt.show()
         if path is not None:
             fig.savefig(path)
+        plt.close()
 
     def test(self, base_path):
-        x = np.arange(5, 11, 1)
-        methods = ['GSBA-U', 'GSBA-RC', 'GSBA-DC', 'GSBA-JC', 'GSBA-RI', 'GSBA-DMP']
-        m = 6
-        xlable = 'The number of observed infected nodes, N'
-        y = [[0.51, 0.48, 0.54, 0.43, 0.4, 0.44],
-             [0.67, 0.49, 0.55, 0.5, 0.4, 0.45],
-             [0.57, 0.46, 0.51, 0.45, 0.38, 0.48],
-             [0.58, 0.47, 0.51, 0.43, 0.4, 0.47],
-             [0.57, 0.45, 0.53, 0.45, 0.38, 0.47],
-             [0.66, 0.59, 0.66, 0.62, 0.51, 0.61]]
+        x = np.arange(20, 46, 5)
+        methods = ['RC', 'DC', 'JC', 'GSBA-RC', 'GSBA-DC', 'GSBA-JC']
+        m = len(methods)
+        xlable = 'Number of  infected nodes, N'
+        y = [[0.092086622, 0.075288403, 0.069216758, 0.063145112, 0.047763611, 0.043108682],
+             [0.087634082, 0.069823922, 0.060716454, 0.052823315, 0.044930176, 0.042096742],
+             [0.113337381, 0.087634082, 0.075490791, 0.07124064, 0.062133171, 0.049989881],
+             [0.156243675, 0.126087836, 0.114754098, 0.107468124, 0.087634082, 0.081562437],
+             [0.17911354, 0.148755313, 0.132564258, 0.118801862, 0.101801255, 0.094312892],
+             [0.182756527, 0.150779194, 0.133171423, 0.119409027, 0.102003643, 0.093300951], ]
         ylabel = 'Detection Rate'
-        path = base_path + 'test.pdf'
-        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+        path = base_path + 'wiki-vote-prior-full-rate.pdf'
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
     def results_on_scale_free(self, base_path):
         x = np.arange(5, 11, 1)
         methods = ['RC', 'DC', 'JC', 'RI', 'DI', 'DMP', 'GSBA-JC', 'BFSA-JC']
         m = len(methods)
-        xlable = 'The number of observed infected nodes, N'
+        xlable = 'Number of  infected nodes, N'
         y = [[0.35,0.27,0.26,0.27,0.17,0.17],[
 0.36,0.32,0.26,0.26,0.15,0.16],[
 0.29,0.28,0.27,0.23,0.29,0.29],[
@@ -172,7 +178,7 @@ class Fig:
         x = np.arange(20, 46, 5)
         methods = ['RC', 'DC', 'JC', 'RI', 'DI', 'GSBA-JC']
         m = len(methods)
-        xlable = 'The number of observed infected nodes, N'
+        xlable = 'Number of  infected nodes, N'
         y = [[0.08, 0.11, 0.05, 0.15, 0.07, 0.03], [
             0.08, 0.06, 0.06, 0.09, 0.03, 0.02], [
                  0.03, 0.08, 0.11, 0.12, 0.07, 0.07], [
@@ -238,7 +244,7 @@ class Fig:
         x = np.arange(20, 46, 5)
         methods = ['RC', 'DC', 'JC', 'RI', 'DI', 'GSBA-JC']
         m = len(methods)
-        xlable = 'The number of observed infected nodes, N'
+        xlable = 'Number of  infected nodes, N'
         y = [[0.36, 0.37, 0.31, 0.31, 0.36, 0.22], [
             0.13, 0.2, 0.06, 0.07, 0.04, 0.02], [
                  0.22, 0.27, 0.21, 0.21, 0.13, 0.14], [
@@ -300,11 +306,52 @@ class Fig:
         path = base_path + 'wiki-vote-full-ranking.pdf'
         self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
+    def results_on_ca_astroph(self, base_path):
+        x = np.arange(20, 46, 5)
+        methods = ['RC', 'DC', 'JC', 'RI', 'DI', 'GSBA-RC', 'GSBA-DC', 'GSBA-JC']
+        m = len(methods)
+        xlable = 'Number of  infected nodes, N'
+        y = [[0.256,0.2315,0.2335,0.205,0.202,0.1945],[
+0.1305,0.114,0.1055,0.0885,0.0595,0.064],[
+0.211,0.1915,0.1795,0.1515,0.136,0.1325],[
+0.089,0.064,0.0685,0.0505,0.042,0.0415],[
+0.275,0.2465,0.2065,0.1765,0.1535,0.1245],[
+0.334,0.27,0.2645,0.262,0.2405,0.213],[
+0.24,0.1955,0.184,0.1905,0.1855,0.15],[
+0.256,0.1975,0.186,0.19,0.1835,0.152]]
+        ylabel = 'Detection Rate'
+        path = base_path + 'ca-astroph-random-rate.pdf'
+        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+
+        y =[[0.8345,0.887,0.8915,0.952,0.9725,1.001],[
+1.045,1.1245,1.1565,1.219,1.2885,1.3295],[
+0.9385,1.011,1.029,1.099,1.1615,1.1945],[
+1.22,1.3835,1.393,1.4875,1.5455,1.558],[
+0.8705,0.94,0.998,1.077,1.14,1.19],[
+0.784,0.9,0.9265,0.9275,0.9965,1.0655],[
+0.9775,1.099,1.126,1.1235,1.1925,1.283],[
+0.9625,1.0995,1.1295,1.1285,1.199,1.288]]
+        ylabel = 'Detection Error'
+        path = base_path + 'ca-astroph-random-error.pdf'
+        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+
+        y = [[0.33645,0.33494,0.298733333,0.307085714,0.301375,0.292022222],[
+0.4881,0.4711,0.465433333,0.466785714,0.4821625,0.474577778],[
+0.40625,0.3882,0.380516667,0.374671429,0.384525,0.371411111],[
+0.4585,0.4892,0.491866667,0.475742857,0.4834,0.492344444],[
+0.404675,0.42152,0.423483333,0.446085714,0.4680375,0.471077778],[
+0.188525,0.19358,0.176933333,0.181971429,0.1692,0.172111111],[
+0.221375,0.222,0.205783333,0.205828571,0.19255,0.197311111],[
+0.21655,0.2191,0.204566667,0.2048,0.191225,0.196211111]]
+        ylabel = 'Detection Ranking'
+        path = base_path + 'ca-astroph-random-ranking.pdf'
+        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+
     def effect_of_different_priors(self, base_path):
         x = np.arange(20, 46, 5)
         methods = ['RC', 'DC', 'JC', 'GSBA-RC', 'GSBA-DC', 'GSBA-JC']
         m = len(methods)
-        xlable = 'The number of observed infected nodes, N'
+        xlable = 'Number of  infected nodes, N'
         y = [[0.092086622, 0.075288403, 0.069216758, 0.063145112, 0.047763611, 0.043108682],
              [0.087634082, 0.069823922, 0.060716454, 0.052823315, 0.044930176, 0.042096742],
              [0.113337381, 0.087634082, 0.075490791, 0.07124064, 0.062133171, 0.049989881],
@@ -313,7 +360,7 @@ class Fig:
              [0.182756527, 0.150779194, 0.133171423, 0.119409027, 0.102003643, 0.093300951], ]
         ylabel = 'Detection Rate'
         path = base_path + 'power-grid-prior-full-rate.pdf'
-        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
         y = [[1.859542603, 2.085205424, 2.253187614, 2.37259664, 2.522363894, 2.649868448],
              [1.865614248, 2.082169601, 2.252985226, 2.370977535, 2.505768063, 2.611009917],
@@ -323,7 +370,7 @@ class Fig:
              [1.652499494, 1.866828577, 2.030965392, 2.158065169, 2.360858126, 2.44161101], ]
         ylabel = 'Detection Error'
         path = base_path + 'power-grid-prior-full-error.pdf'
-        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
         y = [[0.437543007, 0.43623558, 0.439141874, 0.431555209, 0.434036632, 0.434774787],
              [0.42157458, 0.41896782, 0.42340282, 0.417411166, 0.418594414, 0.416177562],
@@ -333,8 +380,9 @@ class Fig:
              [0.264480874, 0.258708763, 0.256068272, 0.249197675, 0.248709775, 0.245330455], ]
         ylabel = 'Detection Ranking'
         path = base_path + 'power-grid-prior-full-ranking.pdf'
-        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
+        """++++++++++++++++++++++++++++++++++++++++++++++++++"""
         x = np.arange(5, 11, 1)
         y = [[0.33, 0.304, 0.27, 0.256, 0.212, 0.182],
              [0.332, 0.302, 0.266, 0.244, 0.22, 0.18],
@@ -344,7 +392,7 @@ class Fig:
              [0.572, 0.5, 0.514, 0.468, 0.468, 0.408], ]
         ylabel = 'Detection Rate'
         path = base_path + 'scale-free-prior-full-rate.pdf'
-        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
         y = [[0.71, 0.76, 0.802, 0.882, 0.918, 1.032],
              [0.706, 0.77, 0.806, 0.912, 0.902, 1.016],
@@ -354,7 +402,7 @@ class Fig:
              [0.514, 0.632, 0.656, 0.742, 0.74, 0.87], ]
         ylabel = 'Detection Error'
         path = base_path + 'scale-free-prior-full-error.pdf'
-        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
         y = [[0.4648, 0.427, 0.408857143, 0.38525, 0.362, 0.3656],
              [0.4464, 0.406333333, 0.400857143, 0.38825, 0.372, 0.3814],
@@ -364,7 +412,39 @@ class Fig:
              [0.3204, 0.297333333, 0.271428571, 0.25825, 0.233111111, 0.2356], ]
         ylabel = 'Detection Ranking'
         path = base_path + 'scale-free-prior-full-ranking.pdf'
-        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+
+        """++++++++++++++++++++++++++++++++++++++++++++++++++"""
+        x = np.arange(20, 46, 5)
+        y = [[0.335692046,0.318426267,0.307529012,0.301585055,0.294084348,0.286725163],[
+0.144070195,0.102037928,0.076280781,0.050523634,0.039060289,0.027030852],[
+0.269883951,0.231672799,0.20223606,0.180866119,0.161902066,0.142230399],[
+0.67478064,0.643928673,0.619728276,0.578828191,0.553212567,0.521936032],[
+0.523775828,0.493489952,0.466883668,0.435890178,0.417916785,0.405038211],[
+0.518681008,0.490942542,0.463628644,0.433342768,0.41664308,0.404189074]]
+        ylabel = 'Detection Rate'
+        path = base_path + 'wiki-vote-prior-full-rate.pdf'
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+
+        y = [[0.691480328,0.718652703,0.735918483,0.753608831,0.773988112,0.794791962],[
+1.113218228,1.239173507,1.34602321,1.440418907,1.521369941,1.580526465],[
+0.821964336,0.895980753,0.960939711,1.018681008,1.077271441,1.139824512],[
+0.464902349,0.514435324,0.557741296,0.632040759,0.670534956,0.714973111],[
+0.674356071,0.740447212,0.799179168,0.869799038,0.909425417,0.961788848],[
+0.678177187,0.742994622,0.801443532,0.870223606,0.910699123,0.957118596]]
+        ylabel = 'Detection Error'
+        path = base_path + 'wiki-vote-prior-full-error.pdf'
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+
+        y = [[0.25546278,0.233908859,0.214808001,0.200731875,0.19072672,0.183105324],[
+0.515319841,0.548406453,0.576889329,0.601261575,0.623782904,0.644969651],[
+0.387432777,0.406476083,0.429427304,0.455270713,0.474288848,0.495971318],[
+0.086187376,0.077565808,0.071662421,0.069819255,0.069264789,0.068015851],[
+0.108986697,0.099790546,0.092428531,0.089773968,0.087768893,0.083995345],[
+0.109786301,0.100475517,0.092777621,0.090000404,0.087751203,0.083923012]]
+        ylabel = 'Detection Ranking'
+        path = base_path + 'wiki-vote-prior-full-ranking.pdf'
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
     def graph(self):
         g = nx.read_weighted_edgelist("../data/test.txt", comments='#')
@@ -375,11 +455,11 @@ class Fig:
 if __name__ == '__main__':
     base_path = '../data/fig/'
     fig = Fig()
-    fig.debug = False
-    if fig.debug:
+    fig.debug = 0
+    if fig.debug == 1:
         fig.test(base_path)
-    fig.graph()
-    # fig.effect_of_different_priors(base_path)
+    fig.effect_of_different_priors(base_path)
     # fig.results_on_scale_free(base_path)
     # fig.results_on_power_grid(base_path)
     # fig.results_on_wiki_vote(base_path)
+    # fig.results_on_ca_astroph(base_path)
