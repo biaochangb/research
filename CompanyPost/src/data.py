@@ -7,6 +7,11 @@ created at 2017/8/7.
 
 import MySQLdb
 import pynlpir
+import traceback
+import re
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 
 class Data:
@@ -19,6 +24,7 @@ class Data:
     post_table = 'post'
     post_terms_table = 'post_terms_top1000'
     vocabulary_table = 'vocabulary'
+    punctuation = "[+\.\!\/_,$%^*(+\"\']+|[+——！，。？、~@#￥%……&*（）]+".decode("utf8")
 
     def __init__(self, database):
         # load stopwords
@@ -47,7 +53,6 @@ class Data:
 
     def tokenize(self):
         vocabulary = {}
-        vocabulary_new = {}
         companies = []
         try:
             r = self.cursor.execute("SELECT * FROM vocabulary")
@@ -55,7 +60,7 @@ class Data:
                 vocabulary[term[1]] = term[0]
             print 'current size of the vocabulary:', r
 
-            r = self.cursor.execute("SELECT * FROM %s order by post_num asc" % self.company_table)
+            r = self.cursor.execute("SELECT * FROM %s order by cid DESC" % self.company_table)
             print 'company num:', r
             i = 0
             for c in self.cursor.fetchall():
@@ -65,16 +70,22 @@ class Data:
                 companies.append(c)
                 c_terms = {}
                 r = self.cursor.execute('SELECT pid,description FROM %s where cname="%s"' % (self.post_table, c[1]))
-                print 'post num:', r
+                print '--post num:', r, c[0]
                 for post in self.cursor.fetchall():
-                    terms = pynlpir.segment(post[1], pos_english=False, pos_tagging=False)
+                    #print '\t', post[0], post[1]
+                    temp = post[1].decode("utf8")
+                    temp = re.sub(self.punctuation, "".decode("utf8"),temp)
+                    terms = pynlpir.segment(temp, pos_english=False, pos_tagging=False)
                     terms_new = []
+                    vocabulary_new = {}
                     for t in terms:
                         t = t.strip()
                         if t not in self.stopwords:
                             if t not in vocabulary.keys():
                                 vocabulary_new[t] = vocabulary.__len__()
                                 vocabulary[t] = vocabulary_new[t]
+                                # sql = 'INSERT INTO vocabulary VALUES(%s,"%s")' % (vocabulary[t], t)
+                                # self.cursor.execute(sql)
                             terms_new.append(vocabulary[t])
                             if vocabulary[t] not in c_terms.keys():
                                 c_terms[vocabulary[t]] = 0
@@ -82,19 +93,18 @@ class Data:
                     sql = 'INSERT INTO %s(pid,cid,terms) VALUES(%s,%s,"%s")' % (
                         self.post_terms_table, post[0], c[0], terms_new)
                     self.cursor.execute(sql)
+                    param = []
+                    for t in vocabulary_new:
+                        param.append([vocabulary_new[t], t])
+                    sql = 'insert into vocabulary values(%s,%s)'
+                    self.cursor.executemany(sql, param)
                 sql = 'INSERT INTO %s(cid,terms) VALUES(%s,"%s")' % (
                     self.company_terms_table, c[0], c_terms)
                 self.cursor.execute(sql)
                 self.conn.commit()
-            param = []
-            for t in vocabulary_new:
-                param.append([vocabulary_new[t], t])
-            sql = 'insert into vocabulary values(%s,%s)'
-            self.cursor.executemany(sql, param)
-            self.conn.commit()
-            print 'current size of the vocabulary:', vocabulary.__len__()
+                print 'current size of the vocabulary:', vocabulary.__len__()
         except Exception as e:
-            print e
+            traceback.print_exc()
             self.conn.rollback()
 
     def extract_training_set(self, num):
