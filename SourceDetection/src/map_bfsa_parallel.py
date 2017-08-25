@@ -112,7 +112,7 @@ class BFSA(method.Method):
                     permitted = False
                     break
 
-                # for j in np.arange(1, i):
+                # for j in npy.arange(1, i):
                 #     if p[j] in self.descendants[p[0]][p[i]]:
                 #         permitted = False
                 #         break
@@ -135,7 +135,7 @@ class BFSA(method.Method):
                 if False in result:
                     return
 
-                # for j in np.arange(1, i):
+                # for j in npy.arange(1, i):
                 #     if nodes[j] in self.descendants[nodes[0]][nodes[i]]:
                 #         return
             l = self.compute_likelihood(nodes)
