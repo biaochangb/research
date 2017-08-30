@@ -5,10 +5,10 @@ Author: Biao Chang, changb110@gmail.com, from University of Science and Technolo
 created at 2017/8/21.
 """
 
+import cPickle
 import time
 
 import numpy as npy
-import scipy.special
 
 import tools
 
@@ -39,7 +39,8 @@ class RMA:
         self._initialize(data)
         # sample z and x by collapsed Gibbs sampling
         print 'topic_num:%s, alpha:%s, beta:%s, delta:%s' % (self.topic_num, self.alpha[0], self.beta[0], self.delta[0])
-        print '-- start the Gibbs sampling'
+        print time.strftime('Current time: %Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        print '-- start the Gibbs sampling with iter_num = %s' % iter_num
         time0 = time.time()
         for i in range(0, iter_num):
             time1 = time.time()
@@ -69,7 +70,7 @@ class RMA:
         self.tuk = npy.zeros((company_num, self.topic_num))
         self.gui = npy.zeros((company_num, self.factor_num))
         self.hkv = npy.zeros((self.topic_num, self.vocabulary_size))
-        self.ev = npy.zeros(self.vocabulary_size)
+        self.euv = npy.zeros((company_num, self.vocabulary_size))
         self.suv = npy.zeros((company_num, self.vocabulary_size))
 
         self.Z = []  # [{pid:z}]
@@ -89,20 +90,28 @@ class RMA:
                     if x_t == 0:
                         self.hkv[z_p, tid] += 1
                     elif x_t == 1:
-                        self.ev[tid] += 1
+                        self.euv[cid, tid] += 1
                     else:
                         self.suv[cid, tid] += 1
                 self.X[cid][pid] = npy.asarray(self.X[cid][pid])
 
+        self.beta_sum = npy.sum(self.beta)
+        self.gamma_row_sum = npy.sum(self.gamma, axis=1)
+        self._lambda_row_sum = npy.sum(self._lambda, axis=1)
+
+        self.hkv_row_sums = npy.sum(self.hkv, axis=1)
+        self.euv_row_sums = npy.sum(self.euv, axis=1)
+        self.suv_row_sums = npy.sum(self.suv, axis=1)
+
     def draw_z(self, cid, pid, terms):
         z_prev = self.Z[cid][pid]
-        hkv_prev = self.hkv.copy()
         # exclude the pid-post
         self.tuk[cid, z_prev] -= 1
         tx0 = terms[npy.where(self.X[cid][pid] == 0)]
         tx0_counts = {}  # the number of times each term appearing in tx0
         for t in tx0:
             self.hkv[z_prev, t] -= 1
+            self.hkv_row_sums[z_prev] -= 1
             if tx0_counts.has_key(t):
                 tx0_counts[t] += 1
             else:
@@ -110,32 +119,22 @@ class RMA:
 
         # get the full conditional distribution according to the sampling equation.
         p_z = self.alpha + self.tuk[cid]
-        p_z /= npy.sum(p_z)
-        sum_beta_hk = npy.sum(self.beta + self.hkv[z_prev])
-        log_sum = -npy.sum(npy.log(npy.arange(sum_beta_hk, sum_beta_hk + len(tx0))))    # avoid OverflowError
+        # p_z /= npy.sum(p_z)
+        sum_beta_hk = self.beta_sum + self.hkv_row_sums[z_prev]
+        log_sum = -npy.sum(npy.log(npy.arange(sum_beta_hk, sum_beta_hk + len(tx0))))  # avoid OverflowError
         for t in tx0_counts:
             y = self.beta[t] + self.hkv[z_prev][t]
             log_sum += npy.sum(npy.log(npy.arange(y, y + tx0_counts[t])))
         p_z[z_prev] = npy.exp(log_sum)
 
-        # t0 = self.alpha + self.tuk[cid]
-        # t1 = npy.tile(self.beta, (self.topic_num, 1)) + self.hkv
-        # t2 = npy.tile(self.beta, (self.topic_num, 1)) + hkv_prev
-        # t1_row_sums = npy.sum(t1, axis=1)
-        # t2_row_sums = npy.sum(t2, axis=1)
-        # p_z = npy.log(t0 / npy.sum(t0))
-        # p_z += scipy.special.gammaln(t1_row_sums) - scipy.special.gammaln(t2_row_sums)
-        # p_z += npy.sum(scipy.special.gammaln(t2), axis=1) - npy.sum(scipy.special.gammaln(t1), axis=1)
-        # p_z = npy.exp(p_z)   # the above gets the log full conditional distribution to avoid OverflowError for math.gamma
-        # print p_z
-
         # sample the new topic of current post
-        r = npy.random.multinomial(1, p_z / npy.sum(p_z))
-        z_new = npy.where(r == 1)[0][0]
+        # z_new = tools.multinomial_sampling(p_z, self.topic_num)
+        z_new = tools.random_sampling_for_multinomial(p_z, self.topic_num)
         self.Z[cid][pid] = z_new
         self.tuk[cid, z_new] += 1
         for t in tx0:
             self.hkv[z_new, t] += 1
+            self.hkv_row_sums[z_new] += 1
 
     def draw_x(self, cid, pid, t_index, term):
         x_prev = self.X[cid][pid][t_index]
@@ -145,32 +144,35 @@ class RMA:
         self.gui[cid, x_prev] -= 1
         if x_prev == 0:
             self.hkv[z, term] -= 1
+            self.hkv_row_sums[z] -= 1
         elif x_prev == 1:
-            self.ev[term] -= 1
+            self.euv[cid, term] -= 1
+            self.euv_row_sums[cid] -= 1
         else:
             self.suv[cid, term] -= 1
+            self.suv_row_sums[cid] -= 1
 
         # get the full conditional distribution to draw its indicator
-        p_x = npy.zeros(self.factor_num)
-        sum_temp = npy.sum(self.delta + self.gui[cid])
-        p_x[0] = (self.delta[0] + self.gui[cid, 0]) / sum_temp * (
-            self.beta[term] + self.hkv[z, term]) / npy.sum(self.beta + self.hkv[z])
-        p_x[1] = (self.delta[1] + self.gui[cid, 1]) / sum_temp * (
-            self.gamma[term] + self.ev[term]) / npy.sum(self.gamma + self.ev)
-        p_x[2] = (self.delta[2] + self.gui[cid, 2]) / sum_temp * (
-            self._lambda[term] + self.suv[cid, term]) / npy.sum(self._lambda + self.suv[cid])
+        p_x = self.delta + self.gui[cid]
+        # p_x /= npy.sum(p_x)
+        p_x[0] *= (self.beta[term] + self.hkv[z, term]) / (self.beta_sum + self.hkv_row_sums[z])
+        p_x[1] *= (self.gamma[cid,term] + self.euv[cid,term]) / (self.gamma_row_sum[cid] + self.euv_row_sums[cid])
+        p_x[2] *= (self._lambda[cid,term] + self.suv[cid, term]) / (self._lambda_row_sum[cid] + self.suv_row_sums[cid])
 
-        # sample the new indicator of current term
-        x_new = tools.random_sampling_for_multinomial(
-            p_x)  # this method is faster than npy.random.multinomial when len(p_x) is small.
+        """sample the new indicator of current term."""
+        # x_new = tools.multinomial_sampling(p_x, 3)
+        x_new = tools.random_sampling_for_multinomial(p_x,3)
         self.X[cid][pid][t_index] = x_new
         self.gui[cid, x_new] += 1
         if x_new == 0:
             self.hkv[z, term] += 1
+            self.hkv_row_sums[z] += 1
         elif x_new == 1:
-            self.ev[term] += 1
+            self.euv[cid, term] += 1
+            self.euv_row_sums[cid] += 1
         else:
             self.suv[cid, term] += 1
+            self.suv_row_sums[cid] += 1
 
         return x_new
 
@@ -179,11 +181,11 @@ class RMA:
         theta *= 1.0 / npy.tile(npy.sum(theta, axis=1), (self.topic_num, 1)).transpose()  # normalize
         phi = npy.tile(self.beta, (self.topic_num, 1)) + self.hkv
         phi *= 1.0 / npy.tile(npy.sum(phi, axis=1), (self.vocabulary_size, 1)).transpose()  # normalize
-        mu = self._lambda + self.ev
-        mu *= 1.0 / npy.sum(mu)
+        mu = self.gamma + self.euv
+        mu *= 1.0 / npy.tile(npy.sum(mu, axis=1), (self.vocabulary_size, 1)).transpose()
         psi = npy.tile(self.delta, (self.company_num, 1)) + self.gui
         psi *= 1.0 / npy.tile(npy.sum(psi, axis=1), (self.factor_num, 1)).transpose()  # normalize
-        pi = npy.tile(self._lambda, (self.company_num, 1)) + self.suv
+        pi = self._lambda + self.suv
         pi *= 1.0 / npy.tile(npy.sum(pi, axis=1), (self.vocabulary_size, 1)).transpose()  # normalize
 
         self.theta = theta
@@ -191,6 +193,14 @@ class RMA:
         self.mu = mu
         self.psi = psi
         self.pi = pi
+
+        f = open('../data/results.data', 'w')
+        cPickle.dump(theta, f)
+        cPickle.dump(phi, f)
+        cPickle.dump(mu, f)
+        cPickle.dump(psi, f)
+        cPickle.dump(pi, f)
+        f.close()
 
     def log_complete_likelihood(self):
         """Calculate the complete log likelihood, log p(w,z,x), given the hyper-parameters.
@@ -204,10 +214,10 @@ class RMA:
         for cid in range(0, self.company_num):
             l += tools.log_delta_function(self.alpha + self.tuk[cid]) + tools.log_delta_function(
                 self.delta + self.gui[cid]) - ldelta_f_alpha - ldelta_f_delta
-            l += tools.log_delta_function(self._lambda + self.suv[cid]) - ldelta_f_lambda
+            l += tools.log_delta_function(self.gamma[cid] + self.euv[cid]) - tools.log_delta_function(self.gamma[cid])
+            l += tools.log_delta_function(self._lambda[cid] + self.suv[cid]) - tools.log_delta_function(self._lambda[cid])
         for k in range(0, self.topic_num):
             l += tools.log_delta_function((self.beta + self.hkv[k])) - ldelta_f_beta
-        l += tools.log_delta_function(self.gamma + self.ev) - ldelta_f_gamma
 
         return l
 

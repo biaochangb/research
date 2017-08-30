@@ -2,6 +2,7 @@ SELECT COUNT(*) FROM lagou.`post`;
 SELECT * FROM lagou.`post` WHERE job LIKE '%/%';
 SELECT cname, COUNT(*) AS post_num FROM lagou.`post` GROUP BY cname ORDER BY post_num DESC INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 5.7/Uploads/company_post_num.txt';
 SELECT COUNT(*) FROM lagou.`post` GROUP BY cname;
+SELECT COUNT(*) FROM lagou.`post`;
 #truncate company;
 
 SELECT cname, COUNT(*) AS post_num, `cfields`,`csize`,`cpage`,`capital`,`clocation` FROM lagou.`post` GROUP BY cname ORDER BY post_num DESC;
@@ -43,9 +44,11 @@ DELETE FROM post WHERE pid IN (110323,110369,110392,110421,110549,112323,117363,
 
 CREATE INDEX cid_index ON `post_terms_top1000`(cid);
 SELECT * FROM post_terms_top1000 WHERE cid=1;
-SELECT * FROM post_top1000 WHERE cfields LIKE "%电子商务%"
+SELECT * FROM post_top1000 WHERE cfields LIKE "%电子商务%";
 
+SELECT COUNT(*) AS n, industry FROM company_industry WHERE cid<1001 GROUP BY industry ORDER BY n;
 
+#TRUNCATE `company_industry` ;
 #TRUNCATE `vocabulary`;
 #TRUNCATE `post_terms_top1000`;
 #TRUNCATE `company_terms_top1000`;
