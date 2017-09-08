@@ -8,14 +8,14 @@ created at 2017/8/21.
 import cPickle
 import time
 import math
-import random
 import numpy as npy
-
+import random
 import tools
 
 
-class RMA:
-    """The basic Recruitment Market Analysis model using collapsed Gibbs sampling"""
+class RMA_T:
+    """The basic Recruitment Market Analysis model with factors of individual business requirements,
+    and industry trends, using collapsed Gibbs sampling"""
 
     def __init__(self, vocabulary, topic_num, alpha, beta, gamma, delta, _lambda):
         self.vocabulary = vocabulary
@@ -26,7 +26,7 @@ class RMA:
         self.gamma = gamma
         self.delta = delta
         self._lambda = _lambda
-        self.factor_num = 3
+        self.factor_num = 2
         self.log_likelihoods = []
 
     def test(self, data):
@@ -34,9 +34,10 @@ class RMA:
         c_num = len(data)
         a0 = npy.tile(self.psi[:,0].reshape(self.company_num,1),(1,self.vocabulary_size))
         a1= npy.tile(self.psi[:,1].reshape(self.company_num,1),(1,self.vocabulary_size))
-        a2= npy.tile(self.psi[:,2].reshape(self.company_num,1),(1,self.vocabulary_size))
+        # a2= npy.tile(self.psi[:,2].reshape(self.company_num,1),(1,self.vocabulary_size))
         "The probability to draw word j for company i"
-        company2word = a0*npy.dot(self.theta, self.phi) + a1*self.mu + a2*self.pi
+        # company2word = a0*npy.dot(self.theta, self.phi) + a1*self.mu + a2*self.pi
+        company2word = a0*npy.dot(self.theta, self.phi) + a1*self.mu
         log_company2word = npy.log(company2word)
         ll = 0
         n = 0
@@ -65,17 +66,17 @@ class RMA:
         for i in range(0, iter_num):
             time1 = time.time()
             for cid in range(0, self.company_num):
-                posts = [(cid,pid,data[cid][pid]) for pid in data[cid]]
+                posts = [(cid, pid, data[cid][pid]) for pid in data[cid]]
                 map(self.draw, posts)
                 # for pid in data[cid]:
                 #     p_terms = data[cid][pid]
                 #     self.draw_z(cid, pid, p_terms)
                 #     self.draw_x2(cid, pid, p_terms)
-                    # for t_index in range(0, len(p_terms)):
-                    #     self.draw_x(cid, pid, t_index, p_terms[t_index])
+                # for t_index in range(0, len(p_terms)):
+                #     self.draw_x(cid, pid, t_index, p_terms[t_index])
 
-            # ll = self.log_complete_likelihood()
-            # self.log_likelihoods.append(ll)
+                # ll = self.log_complete_likelihood()
+                # self.log_likelihoods.append(ll)
             ll = 0
             time2 = time.time()
             print '%s-iteration: log_complete_likelihood = %s, running time: %ss' % (i, ll, time2 - time1)
@@ -83,7 +84,7 @@ class RMA:
         self.estimate()
 
     def draw(self, post):
-        cid,pid,p_terms = post
+        cid, pid, p_terms = post
         self.draw_z(cid, pid, p_terms)
         self.draw_x2(cid, pid, p_terms)
 
@@ -102,7 +103,7 @@ class RMA:
         self.gui = npy.zeros((company_num, self.factor_num))
         self.hkv = npy.zeros((self.topic_num, self.vocabulary_size))
         self.euv = npy.zeros((company_num, self.vocabulary_size))
-        self.suv = npy.zeros((company_num, self.vocabulary_size))
+        # self.suv = npy.zeros((company_num, self.vocabulary_size))
 
         self.Z = []  # [{pid:z}]
         self.X = []  # [cid:{pid:[x]}]
@@ -120,10 +121,10 @@ class RMA:
                     self.gui[cid, x_t] += 1
                     if x_t == 0:
                         self.hkv[z_p, tid] += 1
-                    elif x_t == 1:
-                        self.euv[cid, tid] += 1
                     else:
-                        self.suv[cid, tid] += 1
+                        self.euv[cid, tid] += 1
+                    # else:
+                    #     self.suv[cid, tid] += 1
                 self.X[cid][pid] = npy.asarray(self.X[cid][pid])
 
         self.beta_sum = npy.sum(self.beta)
@@ -132,7 +133,7 @@ class RMA:
 
         self.hkv_row_sums = npy.sum(self.hkv, axis=1)
         self.euv_row_sums = npy.sum(self.euv, axis=1)
-        self.suv_row_sums = npy.sum(self.suv, axis=1)
+        # self.suv_row_sums = npy.sum(self.suv, axis=1)
 
     def draw_z(self, cid, pid, terms):
         Z = self.Z
@@ -169,7 +170,7 @@ class RMA:
         # for t in tx0_counts:
         #     ss = self.beta[t] + hkv[z_prev][t]
         #     log_sum += npy.sum(npy.log(npy.linspace(ss, ss+ tx0_counts[t] - 1, tx0_counts[t])))
-        p_z[z_prev] *= math.exp(log_sum)
+        p_z[z_prev] *= npy.exp(log_sum)
 
         # sample the new topic of current post
         # z_new = tools.multinomial_sampling(p_z, self.topic_num)
@@ -184,17 +185,13 @@ class RMA:
         delta = self.delta
         beta = self.beta
         gamma = self.gamma
-        _lambda = self._lambda
         hkv = self.hkv
         euv = self.euv
-        suv = self.suv
         gui = self.gui
         hkv_row_sums = self.hkv_row_sums
         euv_row_sums = self.euv_row_sums
-        suv_row_sums = self.suv_row_sums
         beta_sum = self.beta_sum
         gamma_row_sum = self.gamma_row_sum
-        _lambda_row_sum = self._lambda_row_sum
         z = self.Z[cid][pid]  # the topic of this post
         X = self.X
         for t_index in range(0, len(p_terms)):
@@ -206,36 +203,26 @@ class RMA:
             if x_prev == 0:
                 hkv[z, term] -= 1
                 hkv_row_sums[z] -= 1
-            elif x_prev == 1:
+            else:
                 euv[cid, term] -= 1
                 euv_row_sums[cid] -= 1
-            else:
-                suv[cid, term] -= 1
-                suv_row_sums[cid] -= 1
 
             # get the full conditional distribution to draw its indicator
             p_x = delta + gui[cid]
-            # p_x /= npy.sum(p_x)
             p_x[0] *= (beta[term] + hkv[z, term]) / (beta_sum + hkv_row_sums[z])
-            p_x[1] *= (gamma[cid, term] + euv[cid, term]) / (gamma_row_sum[cid] + euv_row_sums[cid])
-            p_x[2] *= (_lambda[cid, term] + suv[cid, term]) / (_lambda_row_sum[cid] + suv_row_sums[cid])
+            p_x[1] *= (gamma[cid, term] + euv[cid, term]) / (gamma_row_sum[cid] +euv_row_sums[cid])
 
             """sample the new indicator of current term."""
-            # x_new = tools.random_sampling_for_multinomial(p_x,3)
             p_x /= sum(p_x)
             v = random.random()
             if v <= p_x[0]:
                 x_new = 0
                 hkv[z, term] += 1
                 hkv_row_sums[z] += 1
-            elif v <= (p_x[0] + p_x[1]):
+            else:
                 x_new = 1
                 euv[cid, term] += 1
                 euv_row_sums[cid] += 1
-            else:
-                x_new = 2
-                suv[cid, term] += 1
-                suv_row_sums[cid] += 1
             X[cid][pid][t_index] = x_new
             gui[cid, x_new] += 1
 
@@ -245,11 +232,11 @@ class RMA:
         tuk = self.tuk
         hkv = self.hkv
         euv = self.euv
-        suv = self.suv
+        # suv = self.suv
         gui = self.gui
         hkv_row_sums = self.hkv_row_sums
         euv_row_sums = self.euv_row_sums
-        suv_row_sums = self.suv_row_sums
+        # suv_row_sums = self.suv_row_sums
 
         x_prev = X[cid][pid][t_index]
         z = Z[cid][pid]  # the topic of this post
@@ -259,38 +246,41 @@ class RMA:
         if x_prev == 0:
             hkv[z, term] -= 1
             hkv_row_sums[z] -= 1
-        elif x_prev == 1:
+        else:
             euv[cid, term] -= 1
             euv_row_sums[cid] -= 1
-        else:
-            suv[cid, term] -= 1
-            suv_row_sums[cid] -= 1
+        # else:
+        #     suv[cid, term] -= 1
+        #     suv_row_sums[cid] -= 1
 
         # get the full conditional distribution to draw its indicator
         p_x = self.delta + gui[cid]
         # p_x /= npy.sum(p_x)
         p_x[0] *= (self.beta[term] + self.hkv[z, term]) / (self.beta_sum + self.hkv_row_sums[z])
         p_x[1] *= (self.gamma[cid,term] + self.euv[cid,term]) / (self.gamma_row_sum[cid] + self.euv_row_sums[cid])
-        p_x[2] *= (self._lambda[cid,term] + self.suv[cid, term]) / (self._lambda_row_sum[cid] + self.suv_row_sums[cid])
+        # p_x[2] *= (self._lambda[cid,term] + self.suv[cid, term]) / (self._lambda_row_sum[cid] + self.suv_row_sums[cid])
 
         """sample the new indicator of current term."""
+        # x_new = tools.multinomial_sampling(p_x, 3)
         # x_new = tools.random_sampling_for_multinomial(p_x,3)
+
         p_x /= sum(p_x)
         v = random.random()
         if v <= p_x[0]:
             x_new = 0
-            hkv[z, term] += 1
-            hkv_row_sums[z] += 1
-        elif v<= (p_x[0]+p_x[1]):
-            x_new = 1
-            euv[cid, term] += 1
-            euv_row_sums[cid] += 1
         else:
-            x_new = 2
-            suv[cid, term] += 1
-            suv_row_sums[cid] += 1
+            x_new = 1
         X[cid][pid][t_index] = x_new
         gui[cid, x_new] += 1
+        if x_new == 0:
+            hkv[z, term] += 1
+            hkv_row_sums[z] += 1
+        else:
+            euv[cid, term] += 1
+            euv_row_sums[cid] += 1
+        # else:
+        #     suv[cid, term] += 1
+        #     suv_row_sums[cid] += 1
 
     def estimate(self):
         print self.log_likelihoods
@@ -302,34 +292,34 @@ class RMA:
         mu *= 1.0 / npy.tile(npy.sum(mu, axis=1), (self.vocabulary_size, 1)).transpose()
         psi = npy.tile(self.delta, (self.company_num, 1)) + self.gui
         psi *= 1.0 / npy.tile(npy.sum(psi, axis=1), (self.factor_num, 1)).transpose()  # normalize
-        pi = self._lambda + self.suv
-        pi *= 1.0 / npy.tile(npy.sum(pi, axis=1), (self.vocabulary_size, 1)).transpose()  # normalize
+        # pi = self._lambda + self.suv
+        # pi *= 1.0 / npy.tile(npy.sum(pi, axis=1), (self.vocabulary_size, 1)).transpose()  # normalize
 
         self.theta = theta
         self.phi = phi
         self.mu = mu
         self.psi = psi
-        self.pi = pi
+        # self.pi = pi
 
-        f = open('../data/result-theta-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
+        f = open('../data/rmat-result-theta-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
         cPickle.dump(theta.tolist(), f)
         f.close()
-        f = open('../data/result-phi-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
+        f = open('../data/rmat-result-phi-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
         cPickle.dump(phi.tolist(), f)
         f.close()
-        f = open('../data/result-mu-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
+        f = open('../data/rmat-result-mu-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
         cPickle.dump(mu.tolist(), f)
         f.close()
-        f = open('../data/result-psi-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
+        f = open('../data/rmat-result-psi-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
         cPickle.dump(psi.tolist(), f)
         f.close()
-        f = open('../data/result-pi-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
-        cPickle.dump(pi.tolist(), f)
-        f.close()
-        f = open('../data/result-loglikelihood-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
+        # f = open('../data/rmat-result-pi-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
+        # cPickle.dump(pi.tolist(), f)
+        # f.close()
+        f = open('../data/rmat-result-loglikelihood-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
         cPickle.dump(self.log_likelihoods, f)
         f.close()
-        f = open('../data/result-zx-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
+        f = open('../data/rmat-result-zx-t%sb%sd%s.data'%(self.topic_num, self.beta[0], self.delta[0]), 'w')
         cPickle.dump((self.Z, self.X), f)
         f.close()
 
@@ -354,5 +344,5 @@ class RMA:
 
 
 if __name__ == '__main__':
-    rma = RMA()
+    rma = RMA_T()
     rma.fit()

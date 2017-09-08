@@ -7,7 +7,7 @@ created at 2017/8/23.
 import numpy as npy
 import cProfile
 import data
-import recruitment_market_analysis as rma
+import rma_t as rma
 import time
 
 
@@ -28,11 +28,11 @@ class Experiment:
         self.alpha = npy.ones(topic_num) * alpha
         self.beta = beta * npy.ones(vocabulary_size)
 
-        self.delta = delta * npy.ones(3)
+        self.delta = delta * npy.ones(2)
         self._lambda = self.data_source.load_recruitment_competitors_data(companies, 5, from_file=self.from_file)
         self.gamma = self.data_source.load_recruitment_industry_data(companies, from_file=self.from_file)
 
-        self.rma = rma.RMA(vocabulary, topic_num, self.alpha, self.beta, self.gamma, self.delta, self._lambda)
+        self.rma = rma.RMA_T(vocabulary, topic_num, self.alpha, self.beta, self.gamma, self.delta, self._lambda)
 
     def training(self, iter_num=100):
         self.rma.fit(self.training_posts, iter_num)
@@ -51,6 +51,6 @@ if __name__ == '__main__':
     e = Experiment(topic_num, alpha, beta, delta, 300)
     end = time.time()
     print 'Time cost of initialization: ',end-s
-    # e.training(10)
-    cProfile.run('e.training(10)')
+    e.training(10)
     e.test()
+    # cProfile.run('e.training(500)')

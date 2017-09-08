@@ -11,6 +11,11 @@ from ctypes import *
 import numpy as npy
 import scipy.special
 
+def is_chinese(str):
+    return all(u'\u4e00' <= char <= u'\u9fff' for char in str)
+
+def is_english(str):
+    return all('a'<= c<= 'z' or  'A'<= c<= 'Z'for c in str)
 
 def random_sampling_for_multinomial(p, n):
     """random sampling for Multi(p), and return the index.
@@ -18,6 +23,8 @@ def random_sampling_for_multinomial(p, n):
     """
     p /= sum(p)
     v = random.random()
+    if v < p[0]:
+        return 0
     for i in range(1, n):
         p[i] += p[i - 1] # cumulative sum of p[:]
         if v < p[i]:

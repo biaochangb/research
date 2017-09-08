@@ -145,7 +145,7 @@ import timeit
 a = npy.arange(1,20000000)
 time_start = time.time()
 x=0
-for i in npy.arange(1,20000000):
+for i in npy.arange(1,200000):
    x+=1
    if x>1000000:
        break
@@ -153,7 +153,7 @@ time_end = time.time()
 print time_end-time_start
 time_start = time.time()
 x=0
-for i in range(1,20000000):
+for i in range(1,200000):
    x+=1
    if x>1000000:
        break
@@ -166,3 +166,53 @@ print npy.argsort(x, axis=1)
 print npy.where(x>1)
 print x[npy.where(x!=0)]
 print scipy.special.gammaln(x[npy.where(x>0)])
+
+f = {1:2,3:4,5:6}
+print f.items()
+if 7 in f:
+    print 'yes'
+a = npy.array([1,2,3])
+print a*1.0/4
+print a**3
+
+a = npy.array([[1, 2], [3, 4]])
+b = npy.array([[5, 6], [7, 8]])
+print a*b
+print npy.dot(a,b)
+print a[0].reshape(2,1)
+print npy.tile(a[0].reshape(2,1), (1, 3))
+print a[:,0]
+
+x = npy.array([[1,2,3,4,5,6,7],[-1,-2,-3,-4,-5,-6,-7]])
+y = npy.array([0,1,2,0,0])
+x[1,y] = 10
+print x
+
+
+a = npy.arange(1,10000)+0.1
+s = 0
+print npy.arange(a[1], a[1] + 5)
+print npy.log(npy.arange(a[1], a[1] + 5))
+ts = time.time()
+for x in a:
+    s += npy.sum(npy.log(npy.linspace(x, x + 0,1)))
+te = time.time()
+print 'time:',te-ts
+ts = time.time()
+b = [npy.linspace(x, x + 0,1) for x in a]
+s = npy.sum(npy.log(b))
+te = time.time()
+print 'time:',te-ts
+
+a = npy.asarray([[2,3,4],[5,7,1]])
+print npy.prod(a)
+
+x = npy.array([0, 1, 1, 3, 2, 1, 7])
+print npy.bincount(x)
+print npy.argsort(npy.bincount(x))
+
+x = npy.array(['中','国'])
+print x.dtype
+
+y = ['中','国']
+print npy.asarray(y)

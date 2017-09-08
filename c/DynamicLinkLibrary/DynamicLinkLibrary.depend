@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1503739439 source:f:\changbiao\research\c\dynamiclinklibrary\main.cpp
+	"main.h"
+	<time.h>
+	<stdlib.h>
+	<stdio.h>
+
+1503739412 f:\changbiao\research\c\dynamiclinklibrary\main.h
+	<windows.h>
+
+1503712179 source:f:\changbiao\research\c\dynamiclinklibrary\test.cpp
+	<stdio.h>
+	<stdlib.h>
+	"main.h"
+
