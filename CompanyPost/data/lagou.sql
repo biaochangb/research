@@ -35,7 +35,7 @@ SELECT publish_date, COUNT(*) FROM post GROUP BY publish_date ORDER BY publish_d
 
 SELECT * FROM `company_top1000` ORDER BY cid DESC;
 SELECT * FROM `company_top1000` WHERE cid=42 ORDER BY cid DESC;
-SELECT * FROM `company_top1000` WHERE cname = '北京加双筷子科技有限公司';
+SELECT * FROM `company_top1000` WHERE cname = '京东世纪贸易有限公司';
 SELECT * FROM post WHERE cname = '北京畅游瑞科互联技术有限公司';
 SELECT * FROM post_top1000 WHERE description LIKE '%ab %';
 SELECT * FROM post WHERE pid =9857;
@@ -70,3 +70,4 @@ INSERT INTO vocabulary_filter(tid_old,term) SELECT tid,term FROM vocabulary WHER
 UPDATE post_terms_top1000 AS ptt, post_top1000 SET ptt.`publish_date`=post_top1000.`publish_date` WHERE ptt.`pid`=post_top1000.`pid`;
 #select cid, count(*) as n from post_top1000 where publish_date>='2014-05-01' and publish_date <= '2015-06-30' group by cid order by n;
 SELECT cid, COUNT(*) AS n FROM post_top1000 WHERE  publish_date < '2015-05-01' GROUP BY cid ORDER BY n;
+SELECT COUNT(*) FROM post_terms_top1000 WHERE publish_date < '2015-05-01';
