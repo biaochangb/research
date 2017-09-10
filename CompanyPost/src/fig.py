@@ -353,7 +353,7 @@ class Fig:
         # ax.hist(y, bins=[-10, 0,10,100,1000,2000,2500],color='red', linewidth=2)
         ax.hist(y, bins=1000, color='#3A5FCD')
         ax.set_xlim(0, 100)
-        plt.xlabel('Number of Job Posts', fontsize=25)
+        plt.xlabel('Number of Job Postings', fontsize=25)
         plt.ylabel('Number of Companies', fontsize=25)
         plt.xticks(fontsize=25)
         plt.yticks(fontsize=25)
@@ -398,7 +398,7 @@ class Fig:
         fig.autofmt_xdate()
 
         plt.xlabel('Date', fontsize=25)
-        plt.ylabel('Number of Job Posts', fontsize=25)
+        plt.ylabel('Number of Job Postings', fontsize=25)
         # plt.title('Scores by group and Category')
 
         plt.xticks(fontsize=25)
@@ -528,8 +528,8 @@ class Fig:
 
 if __name__ == '__main__':
     fig = Fig()
-    # fig.number_of_posts_per_day()
-    # fig.number_of_posts_per_company()
+    fig.number_of_posts_per_day()
+    fig.number_of_posts_per_company()
     # # fig.test()
     # fig.number_of_comanies_per_industry()
     # fig.perplexity()
@@ -539,10 +539,10 @@ if __name__ == '__main__':
     zx_file = '../data/result-zx-t120b0.1d0.5.data'
     # fig.topic_words_phi(phi_file, zx_file)
     # fig.company_topic_words(theta_file,phi_file,zx_file)
-    psi_file = '../data/result-psi-t120b0.1d0.5.data'
+    psi_file = '../data/result-psi-t120a0.1b0.1d0.5.data'
     # fig.company_psi(psi_file)
     # fig.competition_analysis_rda(theta_file)
     # fig.competition_analysis_tfidf()
     # fig.heatmap()
     # fig.heatmap2()
-    fig.heatmap3()
+    # fig.heatmap3()

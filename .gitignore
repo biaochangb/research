@@ -15,7 +15,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -91,5 +90,9 @@ ENV/
 # myself
 
 */data/simulation/*
-*.data
-*.sql
+*/*.data
+
+/CompanyPost/data/lagou.data.sql
+/CompanyPost/data/*.data
+/c/DynamicLinkLibrary/obj/
+/c/DynamicLinkLibrary/bin/
