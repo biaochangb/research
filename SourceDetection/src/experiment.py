@@ -47,6 +47,8 @@ class Experiment:
             self.error[test_category][m.method_name] = list()
             self.topological_error[test_category][m.method_name] = list()
             self.ranking[test_category][m.method_name] = list()
+            self.running_time[test_category][m.method_name] = list()
+
 
     def start(self, d, test_category, test_num, start,end,step):
         """
@@ -66,7 +68,7 @@ class Experiment:
             self.detect_generated(d, test_category, test_num, infected_size)
             e_time = clock()
             print "Running time:", e_time - s_time
-            self.logger.info(("Running time:", e_time - s_time))
+            # self.logger.info(("Running time:", e_time - s_time))
             self.print_result(test_category)
             print '\n'
             self.logger.info('\n')
@@ -109,7 +111,10 @@ class Experiment:
                 continue
             for m in self.methods:
                 m.set_data(data)
+                start_time = clock()
                 result = m.detect()
+                end_time = clock()
+                self.running_time[test_category][m.method_name].append(end_time - start_time)
                 """evaluate the result"""
                 if len(result) > 0:
                     if result[0][0] == s:
@@ -195,11 +200,12 @@ class Experiment:
         self.logger.info(self.error)
         self.logger.info(self.topological_error)
         self.logger.info(self.ranking)
+        self.logger.info(self.running_time)
         for m in self.methods:
             l = len(self.precision[test][m.method_name]) * 1.0
             if l == 0: continue
             r = sum(self.precision[test][m.method_name]) / l, sum(self.error[test][m.method_name]) / l, sum(
                 self.topological_error[test][m.method_name]) / l, sum(
-                self.ranking[test][m.method_name]) / l, m.method_name, l
-            print r
+                self.ranking[test][m.method_name]) / l,sum(self.running_time[test][m.method_name])/l, m.method_name, l
+            print "%.4f\t%.4f\t%.4f\t%.4f\t%.5f\t%s\t%d"%r
             self.logger.info(r)

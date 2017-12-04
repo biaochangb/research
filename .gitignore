@@ -96,3 +96,4 @@ ENV/
 /CompanyPost/data/*.data
 /c/DynamicLinkLibrary/obj/
 /c/DynamicLinkLibrary/bin/
+*.xml

@@ -30,6 +30,8 @@ import map_gsba2 as gsba2
 import numpy as np
 from experiment import Experiment
 
+import map_gsba_old as gsba_old
+
 if __name__ == '__main__':
 
     prior_detector0 = prior.Uniform()
@@ -38,11 +40,16 @@ if __name__ == '__main__':
     prior_detector3 = dc.DistanceCenter()
     prior_detector4 = jc.JordanCenter()
     prior_detector5 = ri.ReverseInfection()
-    methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(), ri.ReverseInfection(), di.DynamicImportance(), prior_detector2,
-               gsba.GSBA(prior_detector0), gsba.GSBA(prior_detector1), gsba.GSBA( prior_detector3),
-               gsba.GSBA(prior_detector4), gsba.GSBA( prior_detector5), gsba.GSBA(prior_detector2), bfsa_p.BFSA(prior_detector4)]
+    # methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(), ri.ReverseInfection(), di.DynamicImportance(), prior_detector2,
+    #            gsba.GSBA(prior_detector0), gsba.GSBA(prior_detector1), gsba.GSBA( prior_detector3),
+    #            gsba.GSBA(prior_detector4), gsba.GSBA( prior_detector5), gsba.GSBA(prior_detector2), #bfsa_p.BFSA(prior_detector4)
+    #            ]
 
-    logger = log.Logger(logname='../data/main_scale_free.log', loglevel=logging.INFO, logger="experiment").get_log()
+    methods = [rc.RumorCenter(), dc.DistanceCenter(), jc.JordanCenter(),
+               gsba.GSBA(prior_detector1),gsba.GSBA(prior_detector3),gsba.GSBA(prior_detector4)]
+    # methods = [gsba_old(prior_detector1)]
+
+    logger = log.Logger(logname='../data/main_scale_free20171201.log', loglevel=logging.INFO, logger="experiment").get_log()
     experiment = Experiment(methods, logger)
     experiment.propagation_model = 'SI'
 
@@ -53,11 +60,11 @@ if __name__ == '__main__':
     test_num = 100
 
     print 'Graph size: ', d.graph.number_of_nodes(), d.graph.number_of_edges()
-    test_category = experiment.RANDOM_TEST
-    experiment.start(d, test_category, test_num, 9, 11, 1)
+    # test_category = experiment.RANDOM_TEST
+    # experiment.start(d, test_category, test_num, 20, 46, 5)
 
     test_category = experiment.FULL_TEST
-    experiment.start(d, test_category, test_num, 9, 11, 1)
+    experiment.start(d, test_category, test_num, 20, 46, 5)
 
     end_time = clock()
     print "Running time:", end_time-start_time

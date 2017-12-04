@@ -24,6 +24,7 @@ import plotly.plotly as py
 import plotly.tools as tls
 import seaborn as sns
 import matplotlib.cm as cm
+import tools
 
 def my_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
     # return "hsl(0, 0%%, %d%%)" % random.randint(60, 100)
@@ -221,9 +222,9 @@ class Fig:
         z_list = [z[cid][pid] for pid in z[cid]]
         z_counts = np.bincount(z_list)
         z_index_sorted_asc = np.argsort(z_counts)   # sorted by counts
-        topk = 10
-        topn = 50
-        shift = 5
+        topk = 20
+        topn = 1000
+        shift = 1
         words_eng  = set()
         print self.chinese2englihs
         for i in range(topk):
@@ -233,11 +234,15 @@ class Fig:
             print('Topic %s, %s\t: %s'%(k,z_counts[k], ' '.join(words)))
             word_probability = {}
             for j in word_index_sorted_asc[-shift:-(topn+shift):-1]:
-                # print self.vocabulary[j]
-                word = self.chinese2englihs[self.vocabulary[j]]
-                words_eng.add(word)
-                word_probability[word] = phi[k,j]
-            self.word_cloud(word_probability, '../data/fig/word-cloud-phi-cid%s-k%s.png'%(cid,k))
+                if tools.is_english(self.vocabulary[j]):
+                    print self.vocabulary[j]
+                    # word = self.chinese2englihs[self.vocabulary[j]]
+                    word = self.vocabulary[j]
+                    words_eng.add(word)
+                    word_probability[word] = phi[k,j]
+                    if len(word_probability)>=50:
+                        break
+            self.word_cloud(word_probability, '../data/fig/2222word-cloud-phi-cid%s-k%s.png'%(cid,k))
         # for w in words_eng:
         #     print w
         print len(words_eng)
@@ -528,8 +533,8 @@ class Fig:
 
 if __name__ == '__main__':
     fig = Fig()
-    fig.number_of_posts_per_day()
-    fig.number_of_posts_per_company()
+    # fig.number_of_posts_per_day()
+    # fig.number_of_posts_per_company()
     # # fig.test()
     # fig.number_of_comanies_per_industry()
     # fig.perplexity()
@@ -538,7 +543,7 @@ if __name__ == '__main__':
     phi_file = '../data/result-phi-t120b0.1d0.5.data'
     zx_file = '../data/result-zx-t120b0.1d0.5.data'
     # fig.topic_words_phi(phi_file, zx_file)
-    # fig.company_topic_words(theta_file,phi_file,zx_file)
+    fig.company_topic_words(theta_file,phi_file,zx_file)
     psi_file = '../data/result-psi-t120a0.1b0.1d0.5.data'
     # fig.company_psi(psi_file)
     # fig.competition_analysis_rda(theta_file)

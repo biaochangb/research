@@ -12,14 +12,140 @@ import networkx as nx
 
 class Fig:
     """drawing figs according to the experiment results."""
-    colors = {'RC': '#00008f', 'DC': '#0070ff', 'JC': '#00dfff', 'RI': '#bfff40', 'DI': '#ffcf00',
-              'DMP': '#ff6000', 'GSBA-JC': '#ef0000', 'BFSA-JC': '#800000', 'GSBA-U': '#696969', 'GSBA-RC': '#9aad74',
-              'GSBA-DC': '#31591F', 'GSBA-RI': '#bfff40', 'GSBA-DMP': '#ff6000'}
+    # colors = {'RC': '#00008f', 'DC': '#0070ff', 'JC': '#00dfff', 'RI': '#bfff40', 'DI': '#ffcf00',
+    #           'DMP': '#ff6000', 'GSBA-JC': '#ef0000', 'BFSA-JC': '#800000', 'GSBA-U': '#696969', 'GSBA-RC': '#9aad74',
+    #           'GSBA-DC': '#31591F', 'GSBA-RI': '#bfff40', 'GSBA-DMP': '#ff6000'}
+    colors = {'RC': '#4065BB', 'DC': '#FE7E00', 'JC': '#00B200', 'RI': '#D70000', 'DI': '#9E38C3',
+              'DMP': '#8B5446', 'GSBA-JC': '#EB4AC3', 'BFSA-JC': '#7E7E7E', 'GSBA-RC': '#AFCE00',
+              'GSBA-DC': '#24BED4', r'GSBA$^-$':'#000000'}
     markers = {'RC': '.', 'DC': '*', 'JC': 'o', 'RI': 'p', 'DI': '+',
-               'DMP': 'x', 'GSBA-JC': 's', 'BFSA-RC': '^', 'GSBA-U': '>', 'GSBA-RC': '.', 'GSBA-DC': '*',
-               'GSBA-RI': 'p', 'GSBA-DMP': 'x'}
+               'DMP': 'x', 'GSBA-JC': 's', 'BFSA-JC': '^', 'GSBA-U': '>', 'GSBA-RC': '.', 'GSBA-DC': '*',
+               'GSBA-RI': 'p', 'GSBA-DMP': 'x','GSBA$^-$':'x'}
     # hatchs = {'GSBA-RC':'','GSBA-DC','GSBA-JC'}
     debug = False
+
+    def wang_result_recall(self):
+        x = ['Cora','Citeseer']
+        methods = ['Attri', 'Node2vec', 'LINE', 'Node2vec+Attri', 'LINE+Attri', 'TADW', 'UPP-SNE', 'AANE-N','AANE-A','AANE']
+        #colors = ['#0000FF','#1700E8','#2E00D1','#4600B9','#5D00A2','#74008B','#8B0074','#A2005D','#B90046','#696969','#E80017','#FF0000']
+        colors = ['#00008f','#0070ff','#00dfff','#bfff40','#31591F','#ffcf00','#ff6000','#ef0000','#B90046','#800000']
+
+        m = len(methods)
+        xlabel = 'Data'
+        y = [[0.4088,0.6308 ,0.5916 ,0.6516 ,0.6283 ,0.5612 ,0.6116 ,0.7201 ,0.7393 ,0.7443 ],
+             [0.5116 ,0.6402 ,0.6252 ,0.6639 ,0.7135 ,0.7313 ,0.7570 ,0.821 ,0.8402 ,0.8422 ]]
+        ylabel = 'Recall@5'
+        path = base_path + 'recall5.pdf'
+
+        legend = methods[0:m]
+        n = len(legend)
+        width = 0.4  # the width of the bars
+        index = np.arange(len(x))
+        fig, ax = plt.subplots(figsize=(11, 8))
+        for i in np.arange(0, n):
+            print y[0][i],y[1][i]
+            ax.bar(index + i * width * 2 / n + 0.1, [y[0][i],y[1][i]], width * 2 / n, label=legend[i],
+                       color=colors[i])
+        #plt.xlabel(xlabel, fontsize=38)
+        plt.ylabel(ylabel, fontsize=38)
+        # plt.title('Scores by group and Category')
+
+        plt.xticks(index + width + 0.1, x, fontsize=38)
+        plt.yticks(fontsize=38)  # change the num axis size
+        # plt.xlim(0, 50)  # The ceil
+        y_min = np.min(y)
+        y_max = np.max(y)
+        plt.ylim(0.8 * y_min, 1.15 * y_max)  # The ceil
+        plt.legend(loc=1, ncol=n / 2, mode="expand", borderaxespad=0., fontsize=26)
+        plt.tight_layout()
+        if path is not None:
+            fig.savefig(path)
+        plt.show()
+        plt.close()
+
+    def wang_parameter_lines(self):
+        # x = [0,0.2,0.4,0.6,0.8,1]
+        # dataset = ['Cora','Citeseer','DBLP']
+        # colors = ['#0070ff','#31591F','#B90046']
+        # marker = ['*','o','d']
+        # xlabel = r'$\lambda$'
+        # y = [[0.82,0.83 ,0.84 ,0.85 ,0.85 ,0.83 ],
+        #     [0.73 ,0.72 ,0.72 ,0.73 ,0.74 ,0.72 ],
+        #     [0.82 ,0.82 ,0.84 ,0.84 ,0.84 ,0.82]]
+        # ylabel = 'Micro-F1'
+        # path = base_path + 'micro-f1-lambda.pdf'
+        #
+        # legend = dataset
+        # n = len(legend)
+        # width = 5
+        # fig, ax = plt.subplots(figsize=(11, 8))
+        # for i in np.arange(0, n):
+        #     ax.plot(x, y[i], '-D', label=legend[i], color=colors[i], linewidth=width,
+        #             markersize=22, marker=marker[i], markeredgewidth=2)
+        # plt.xlabel(xlabel, fontsize=38)
+        # plt.ylabel(ylabel, fontsize=38)
+        # # plt.title('Scores by group and Category')
+        #
+        # plt.xticks(fontsize=38)
+        # plt.yticks(fontsize=38)  # change the num axis size
+        # # plt.xlim(0, 50)  # The ceil
+        # y_min = np.min(y)
+        # y_max = np.max(y)
+        # x_max = np.max(x)
+        # x_min = np.min(x)
+        # plt.xlim(-0.01, x_max*1.01)
+        # if y_min<0.1:
+        #     plt.ylim(y_min-0.04, 1.05 * y_max)  # The ceil
+        # else:
+        #     plt.ylim(y_min*0.97, 1.05 * y_max)  # The ceil
+        # plt.legend(loc=1, ncol=3, mode="expand", borderaxespad=0., fontsize=28)
+        # plt.tight_layout()
+        # plt.show()
+        # if path is not None:
+        #     fig.savefig(path)
+        # plt.close()
+
+
+        x = [50,100,150,200,250,300]
+        dataset = ['Cora','Citeseer','DBLP']
+        colors = ['#0070ff','#31591F','#B90046']
+        marker = ['*','o','d']
+        xlabel = 'Embedding Dimension, d'
+        y = [[0.84 ,0.85 ,0.85 ,0.85 ,0.85 ,0.85],
+            [0.73 ,0.74 ,0.73 ,0.73 ,0.73 ,0.73 ],
+            [0.83 ,0.83 ,0.83 ,0.84 ,0.84, 0.83 ]]
+        ylabel = 'Micro-F1'
+        path = base_path + 'micro-f1-Embedding-Dimension.pdf'
+
+        legend = dataset
+        n = len(legend)
+        width = 5
+        fig, ax = plt.subplots(figsize=(11, 8))
+        for i in np.arange(0, n):
+            ax.plot(x, y[i], '-D', label=legend[i], color=colors[i], linewidth=width,
+                    markersize=22, marker=marker[i], markeredgewidth=2)
+        plt.xlabel(xlabel, fontsize=38)
+        plt.ylabel(ylabel, fontsize=38)
+        # plt.title('Scores by group and Category')
+
+        plt.xticks(fontsize=38)
+        plt.yticks(fontsize=38)  # change the num axis size
+        # plt.xlim(0, 50)  # The ceil
+        y_min = np.min(y)
+        y_max = np.max(y)
+        x_max = np.max(x)
+        x_min = np.min(x)
+        plt.xlim(x_min-2, x_max*1.01)
+        if y_min<0.1:
+            plt.ylim(y_min-0.04, 1.05 * y_max)  # The ceil
+        else:
+            plt.ylim(y_min*0.97, 1.05 * y_max)  # The ceil
+        plt.legend(loc=1, ncol=3, mode="expand", borderaxespad=0., fontsize=28)
+        plt.tight_layout()
+        plt.show()
+        if path is not None:
+            fig.savefig(path)
+        plt.close()
 
     def bars(self, x, y, legend, xlabel, ylabel, title='', path=None):
         n = len(legend)
@@ -41,6 +167,7 @@ class Fig:
         plt.yticks(fontsize=38)  # change the num axis size
         # plt.xlim(0, 50)  # The ceil
         y_min = np.min(y)
+        y_min = 0
         y_max = np.max(y)
         plt.ylim(0.8 * y_min, 1.28 * y_max)  # The ceil
         plt.legend(loc=1, ncol=n / 2, mode="expand", borderaxespad=0., fontsize=26)
@@ -70,10 +197,11 @@ class Fig:
         x_max = np.max(x)
         x_min = np.min(x)
         plt.xlim(x_min*0.99, x_max*1.01)
-        if y_min<0.1:
-            plt.ylim(y_min-0.04, 1.3 * y_max)  # The ceil
-        else:
-            plt.ylim(y_min*0.9, 1.3 * y_max)  # The ceil
+        # if y_min<0.1:
+        #     plt.ylim(y_min-0.04, 1.3 * y_max)  # The ceil
+        # else:
+        #     plt.ylim(y_min*0.9, 1.3 * y_max)  # The ceil
+        plt.ylim(0, 1.3 * y_max)  # The ceil
         plt.legend(loc=1, ncol=n / 2, mode="expand", borderaxespad=0., fontsize=28)
         plt.tight_layout()
         if self.debug:
@@ -112,7 +240,7 @@ class Fig:
 0.6,0.58,0.67,0.59,0.65,0.51]]
         ylabel = 'Detection Rate'
         path = base_path + 'scale-free-random-rate.pdf'
-        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
         y = [[0.7,0.82,0.8,0.84,0.98,1.04],[
 0.69,0.76,0.8,0.82,1.01,1.03],[
@@ -124,7 +252,7 @@ class Fig:
 0.46,0.49,0.44,0.48,0.51,0.69]]
         ylabel = 'Detection Error'
         path = base_path + 'scale-free-random-error.pdf'
-        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
         y = [[0.462,0.446666667,0.418571429,0.36375,0.378888889,0.385],[
 0.452,0.396666667,0.388571429,0.3925,0.397777778,0.431],[
@@ -136,7 +264,7 @@ class Fig:
 0.31,0.248333333,0.221428571,0.21,0.182222222,0.189]]
         ylabel = 'Detection Ranking'
         path = base_path + 'scale-free-random-ranking.pdf'
-        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
         y = [[0.326,0.288,0.256,0.228,0.218,0.216],[
 0.328,0.288,0.248,0.214,0.22,0.196],[
@@ -148,7 +276,7 @@ class Fig:
 0.644,0.612,0.582,0.61,0.62,0.568]]
         ylabel = 'Detection Rate'
         path = base_path + 'scale-free-full-rate.pdf'
-        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
         y = [[0.712,0.796,0.832,0.886,0.908,0.98],[
 0.718,0.792,0.846,0.894,0.926,0.994],[
@@ -160,7 +288,7 @@ class Fig:
 0.42,0.484,0.538,0.524,0.506,0.594]]
         ylabel = 'Detection Error'
         path = base_path + 'scale-free-full-error.pdf'
-        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
         y = [[0.4576,0.44,0.409714286,0.3875,0.357777778,0.3606],[
 0.4444,0.415,0.406857143,0.388,0.368222222,0.3764],[
@@ -172,7 +300,7 @@ class Fig:
 0.296,0.260666667,0.232571429,0.20325,0.183555556,0.1804]]
         ylabel = 'Detection Ranking'
         path = base_path + 'scale-free-full-ranking.pdf'
-        self.bars(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
     def results_on_power_grid(self, base_path):
         x = np.arange(20, 46, 5)
@@ -446,20 +574,181 @@ class Fig:
         path = base_path + 'wiki-vote-prior-full-ranking.pdf'
         self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
 
+        """++++++++++++++++++++++++++++++++++++++++++++++++++"""
+        x = np.arange(20, 46, 5)
+        y = [[0.256,0.2315,0.2335,0.205,0.202,0.1945],
+[0.1305,0.114,0.1055,0.0885,0.0595,0.064],
+[0.211,0.1915,0.1795,0.1515,0.136,0.1325],
+[0.334,0.27,0.2645,0.262,0.2405,0.213],
+[0.24,0.1955,0.184,0.1905,0.1855,0.15],
+[0.256,0.1975,0.186,0.19,0.1835,0.152]]
+        ylabel = 'Detection Rate'
+        path = base_path + 'ca_astroph-prior-random-rate.pdf'
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+
+        y = [[0.39861657,0.403285756,0.385807738,0.409250785,0.406263404,0.403712213],
+[0.429067749,0.438988907,0.429218909,0.442128488,0.453498177,0.447967744],
+[0.394796191,0.399104237,0.392371735,0.405251857,0.415963359,0.401769667],
+[0.362171149,0.393264568,0.385535622,0.376849979,0.398106747,0.410303798],
+[0.443243015,0.462444605,0.457480636,0.452293884,0.468731617,0.487141657],
+[0.442764189,0.468590322,0.466599798,0.459260383,0.478125604,0.496472922]]
+        ylabel = 'Detection Error'
+        path = base_path + 'ca_astroph-prior-random-error.pdf'
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+
+        y = [[0.33645,0.33494,0.298733333,0.307085714,0.301375,0.292022222],
+[0.4881,0.4711,0.465433333,0.466785714,0.4821625,0.474577778],
+[0.40625,0.3882,0.380516667,0.374671429,0.384525,0.371411111],
+[0.188525,0.19358,0.176933333,0.181971429,0.1692,0.172111111],
+[0.221375,0.222,0.205783333,0.205828571,0.19255,0.197311111],
+[0.21655,0.2191,0.204566667,0.2048,0.191225,0.196211111]]
+        ylabel = 'Detection Ranking'
+        path = base_path + 'ca_astroph-prior-random-ranking.pdf'
+        self.lines(x, y[0:m], methods[0:m], xlable, ylabel, path=path)
+
+
     def graph(self):
         g = nx.read_weighted_edgelist("../data/test.txt", comments='#')
         nx.draw(g)
         nx.draw_networkx_edge_labels(g, pos=nx.spring_layout(g))
         plt.show()
 
+    def running_time_scale_free(self, base_path):
+        d = 0
+
+    def f(self, t):
+        return np.exp(-t) * np.cos(2 * np.pi * t)
+
+    def test_subplot(self,base_path):
+        # t1 = np.arange(0, 5, 0.1)
+        # t2 = np.arange(0, 5, 0.02)
+        #
+        # plt.figure(12)
+        # plt.subplot(331)
+        # plt.plot(t1, self.f(t1), 'bo', t2, self.f(t2), 'r--')
+        #
+        # plt.subplot(332)
+        # plt.plot(t2, np.cos(2 * np.pi * t2), 'r--')
+        #
+        # plt.subplot(333)
+        # plt.plot(t2, np.cos(2 * np.pi * t2), 'r--')
+        #
+        # plt.subplot(312)
+        # plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
+        #
+        # plt.subplot(313)
+        # plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
+        #
+        # plt.show()
+
+        x = np.arange(5, 11, 1)
+        methods = ['RC', 'DC', 'JC', 'RI', 'DI', 'DMP', 'GSBA-JC', 'BFSA-JC']
+        m = len(methods)
+        xlabel = 'Number of  infected nodes, N'
+        y = [[0.35, 0.27, 0.26, 0.27, 0.17, 0.17], [
+            0.36, 0.32, 0.26, 0.26, 0.15, 0.16], [
+                 0.29, 0.28, 0.27, 0.23, 0.29, 0.29], [
+                 0.35, 0.28, 0.27, 0.25, 0.16, 0.15], [
+                 0.25, 0.23, 0.24, 0.22, 0.14, 0.18], [
+                 0.57, 0.61, 0.62, 0.51, 0.63, 0.53], [
+                 0.53, 0.46, 0.55, 0.53, 0.52, 0.37], [
+                 0.6, 0.58, 0.67, 0.59, 0.65, 0.51]]
+        ylabel = 'Detection Rate'
+        path = base_path + '111scale-free-random-rate.pdf'
+
+        y = y[0:m]
+        legend = methods[0:m]
+        n = len(legend)
+        width = 5
+        fig,ax = plt.subplots(1,3, figsize=(20,6)) #
+        axis = ax[0]
+        for i in np.arange(0, n):
+            axis.plot(x, y[i], '-D', label=legend[i], color=self.colors[legend[i]], linewidth=width,
+                    markersize=22, marker=self.markers[legend[i]], markeredgewidth=2)
+        axis.set_xlabel(xlabel, fontsize=30)
+        axis.set_ylabel(ylabel, fontsize=30)
+        # ax[0].set_xticklabels(fontdict={'fontsize':38})
+        # ax[0].set_yticklabels(fontdict={'fontsize':38})  # change the num axis size
+        # plt.xlim(0, 50)  # The ceil
+        y_min = np.min(y)
+        y_max = np.max(y)
+        x_max = np.max(x)
+        x_min = np.min(x)
+        axis.set_xlim(x_min*0.99, x_max*1.01)
+        axis.set_ylim(0, 1.3 * y_max)  # The ceil
+        for tick in axis.xaxis.get_major_ticks():
+            tick.label1.set_fontsize(30)
+        for tick in axis.yaxis.get_major_ticks():
+            tick.label1.set_fontsize(30)
+
+
+
+        axis = ax[1]
+        for i in np.arange(0, n):
+            axis.plot(x, y[i], '-D', label=legend[i], color=self.colors[legend[i]], linewidth=width,
+                    markersize=22, marker=self.markers[legend[i]], markeredgewidth=2)
+        axis.set_xlabel(xlabel, fontsize=30)
+        axis.set_ylabel(ylabel, fontsize=30)
+        # ax[0].set_xticklabels(fontdict={'fontsize':38})
+        # ax[0].set_yticklabels(fontdict={'fontsize':38})  # change the num axis size
+        # plt.xlim(0, 50)  # The ceil
+        y_min = np.min(y)
+        y_max = np.max(y)
+        x_max = np.max(x)
+        x_min = np.min(x)
+        axis.set_xlim(x_min*0.99, x_max*1.01)
+        axis.set_ylim(0, 1.3 * y_max)  # The ceil
+        for tick in axis.xaxis.get_major_ticks():
+            tick.label1.set_fontsize(30)
+        for tick in axis.yaxis.get_major_ticks():
+            tick.label1.set_fontsize(30)
+
+        my_legends = ()
+
+        axis = ax[2]
+        for i in np.arange(0, n):
+            l = axis.plot(x, y[i], '-D', label=legend[i], color=self.colors[legend[i]], linewidth=width,
+                      markersize=22, marker=self.markers[legend[i]], markeredgewidth=2)
+            my_legends.(my_legends)
+        axis.set_xlabel(xlabel, fontsize=30)
+        axis.set_ylabel(ylabel, fontsize=30)
+        # ax[0].set_xticklabels(fontdict={'fontsize':38})
+        # ax[0].set_yticklabels(fontdict={'fontsize':38})  # change the num axis size
+        # plt.xlim(0, 50)  # The ceil
+        y_min = np.min(y)
+        y_max = np.max(y)
+        x_max = np.max(x)
+        x_min = np.min(x)
+        axis.set_xlim(x_min * 0.99, x_max * 1.01)
+        axis.set_ylim(0, 1.3 * y_max)  # The ceil
+        for tick in axis.xaxis.get_major_ticks():
+            tick.label1.set_fontsize(30)
+        for tick in axis.yaxis.get_major_ticks():
+            tick.label1.set_fontsize(30)
+
+        print tuple(legend)
+        fig.legend(my_legends,tuple(legend),fontsize=28)
+
+        plt.tight_layout()  # tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+        plt.show()
+        if path is not None:
+            plt.savefig(path)
+            fig.savefig(path)
+        plt.close()
+
 if __name__ == '__main__':
-    base_path = '../data/fig/'
+    base_path = '../data/fig1204/'
     fig = Fig()
-    fig.debug = 0
-    if fig.debug == 1:
-        fig.test(base_path)
-    fig.effect_of_different_priors(base_path)
+    fig.debug = False
+    fig.test_subplot(base_path)
+
+    # if fig.debug == 1:
+    #     fig.test(base_path)
+    # fig.effect_of_different_priors(base_path)
     # fig.results_on_scale_free(base_path)
     # fig.results_on_power_grid(base_path)
     # fig.results_on_wiki_vote(base_path)
     # fig.results_on_ca_astroph(base_path)
+
+    # fig.wang_result_recall()
+    # fig.wang_parameter_lines()
